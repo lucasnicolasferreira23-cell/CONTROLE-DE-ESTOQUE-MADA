@@ -9,130 +9,300 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}
+        .sidebar-item:hover { background-color: #e2e8f0; }
+        .sidebar-item.active { background-color: #334155; color: white; }
+        @media print {
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            #print-area { 
+                position: static !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 20px !important; 
+                box-shadow: none !important; 
+                border-radius: 0 !important;
+            }
+            #print-area table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+            }
+            #print-area th, #print-area td { 
+                border: 1px solid #000 !important; 
+                padding: 8px !important; 
+                font-size: 12px !important;
+            }
+            #print-area .overflow-x-auto { 
+                overflow: visible !important; 
+            }
+        }
     </style>
 </head>
-<body class="p-6 md:p-10 flex flex-col items-center min-h-screen">
-    <div class="bg-white shadow-xl rounded-xl w-full max-w-4xl p-8 space-y-8">
-        <header class="text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 tracking-wider">CONTROLE DE ESTOQUE MADA</h1>
-            <p class="text-lg md:text-xl text-gray-500 mt-2">Gestão de sobras e chapas</p>
-        </header>
-
-        <div class="text-center text-xs text-gray-400">
-            Seu ID de Usuário: <span id="user-id">Carregando...</span>
-        </div>
-
-        <div class="flex border-b border-gray-200">
-            <button id="tab-cadastro" class="flex-1 py-4 text-center font-medium text-gray-700 hover:text-gray-900 border-b-2 border-transparent transition-colors duration-300">
-                Cadastro
-            </button>
-            <button id="tab-inventario" class="flex-1 py-4 text-center font-medium text-gray-700 hover:text-gray-900 border-b-2 border-transparent transition-colors duration-300">
-                Inventário
-            </button>
-        </div>
-
-        <div id="status-message" class="hidden text-center p-3 rounded-lg font-medium transition-all duration-300"></div>
-        <div id="loading-message" class="text-center p-4">
-            <p class="text-gray-500">Carregando inventário...</p>
-        </div>
-
-        <section id="section-cadastro" class="space-y-6 hidden">
-            <h2 class="sr-only">Cadastro de Materiais</h2>
-            <form id="material-form" class="space-y-6">
-                <div>
-                    <label for="nome" class="block text-sm font-medium text-gray-700">NOME DO MDF</label>
-                    <input type="text" id="nome" name="nome" value="MDF2F" required class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="comprimento" class="block text-sm font-medium text-gray-700">COMPRIMENTO (mm)</label>
-                        <input type="number" id="comprimento" name="comprimento" required class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                    </div>
-                    <div>
-                        <label for="largura" class="block text-sm font-medium text-gray-700">LARGURA (mm)</label>
-                        <input type="number" id="largura" name="largura" required class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                    </div>
-                    <div>
-                        <label for="espessura" class="block text-sm font-medium text-gray-700">ESPESSURA (mm)</label>
-                        <input type="number" id="espessura" name="espessura" required class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                    </div>
-                </div>
-
-                <div>
-                    <label for="quantidade" class="block text-sm font-medium text-gray-700">QUANTIDADE</label>
-                    <input type="number" id="quantidade" name="quantidade" required class="mt-1 block w-40 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                </div>
-                
-                <div>
-                    <label for="localizacao" class="block text-sm font-medium text-gray-700">LOCALIZAÇÃO</label>
-                    <input type="text" id="localizacao" name="localizacao" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                </div>
-
-                <div class="mt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">TIPO</label>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center">
-                            <input id="tipo-chapa" name="tipo" type="radio" value="Chapa" required class="focus:ring-gray-900 h-4 w-4 text-gray-900 border-gray-300">
-                            <label for="tipo-chapa" class="ml-2 block text-sm font-medium text-gray-700">Chapa</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input id="tipo-sobra" name="tipo" type="radio" value="Sobra" required class="focus:ring-gray-900 h-4 w-4 text-gray-900 border-gray-300">
-                            <label for="tipo-sobra" class="ml-2 block text-sm font-medium text-gray-700">Sobra</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition-colors">
-                        Cadastrar
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <section id="section-inventario" class="space-y-6">
-            <h2 class="sr-only">Inventário de Estoque</h2>
-
-            <div class="space-y-4 md:space-y-0 md:flex md:space-x-4">
-                <div class="flex-1">
-                    <input type="text" id="search-nome" placeholder="Pesquisar por nome do MDF" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                </div>
-                <div>
-                    <input type="number" id="search-espessura" placeholder="Filtrar por espessura" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-gray-900 focus:border-gray-900 sm:text-sm">
-                </div>
-                <div>
-                    <button id="filter-btn" class="w-full md:w-auto px-4 py-2 bg-gray-900 text-white rounded-lg shadow-sm hover:bg-gray-800 transition-colors font-medium">
-                        Filtrar
-                    </button>
-                </div>
-                <div>
-                    <button id="clear-filter-btn" class="w-full md:w-auto px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow-sm hover:bg-gray-300 transition-colors font-medium">
-                        Limpar Filtro
-                    </button>
-                </div>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Layout Principal com Sidebar -->
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-800 text-white shadow-2xl no-print">
+            <div class="p-6 border-b border-slate-700">
+                <h1 class="text-xl font-bold text-slate-100">CONTROLE DE ESTOQUE</h1>
+                <p class="text-slate-400 text-sm mt-1">MADA</p>
             </div>
             
-            <div class="overflow-x-auto shadow-md rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome do MDF</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comprimento</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Largura</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Espessura</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localização</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                            <th class="px-6 py-3 relative"><span class="sr-only">Ações</span></th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-table-body" class="bg-white divide-y divide-gray-200"></tbody>
-                </table>
+            <nav class="mt-6">
+                <div class="px-4 py-2">
+                    <p class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-3">MENU</p>
+                    <ul class="space-y-2">
+                        <li>
+                            <button id="tab-cadastro" class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Cadastro
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-inventario" class="sidebar-item active w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                    Inventário
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-utilizacao" class="sidebar-item w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Lista de Utilização
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+                <div class="text-xs text-slate-500">
+                    ID: <span id="user-id" class="text-slate-400">Carregando...</span>
+                </div>
             </div>
-        </section>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="flex-1 flex flex-col">
+            <header class="bg-white border-b border-slate-200 px-8 py-6 no-print">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-800">Sistema de Gestão</h1>
+                        <p class="text-slate-600 mt-1">Controle de materiais e sobras</p>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 p-8">
+                <div id="status-message" class="hidden mb-6 p-4 rounded-lg font-medium transition-all duration-300"></div>
+                <div id="loading-message" class="text-center p-8">
+                    <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-slate-500 bg-white">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Carregando inventário...
+                    </div>
+                </div>
+
+                <section id="section-cadastro" class="space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-slate-800">Cadastrar Material</h2>
+                            <p class="text-slate-600 mt-2">Adicione novos materiais ao estoque</p>
+                        </div>
+                        
+                        <form id="material-form" class="space-y-6">
+                            <div>
+                                <label for="nome" class="block text-sm font-semibold text-slate-700 mb-2">NOME DO MDF</label>
+                                <input type="text" id="nome" name="nome" value="MDF2F" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="comprimento" class="block text-sm font-semibold text-slate-700 mb-2">COMPRIMENTO (mm)</label>
+                                    <input type="number" id="comprimento" name="comprimento" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                                </div>
+                                <div>
+                                    <label for="largura" class="block text-sm font-semibold text-slate-700 mb-2">LARGURA (mm)</label>
+                                    <input type="number" id="largura" name="largura" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                                </div>
+                                <div>
+                                    <label for="espessura" class="block text-sm font-semibold text-slate-700 mb-2">ESPESSURA (mm)</label>
+                                    <input type="number" id="espessura" name="espessura" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="quantidade" class="block text-sm font-semibold text-slate-700 mb-2">QUANTIDADE</label>
+                                    <input type="number" id="quantidade" name="quantidade" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                                </div>
+                                <div>
+                                    <label for="localizacao" class="block text-sm font-semibold text-slate-700 mb-2">LOCALIZAÇÃO</label>
+                                    <input type="text" id="localizacao" name="localizacao" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-3">TIPO</label>
+                                <div class="flex items-center space-x-6">
+                                    <div class="flex items-center">
+                                        <input id="tipo-chapa" name="tipo" type="radio" value="Chapa" required class="h-4 w-4 text-slate-600 focus:ring-slate-500 border-slate-300">
+                                        <label for="tipo-chapa" class="ml-3 text-sm font-medium text-slate-700">Chapa</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="tipo-sobra" name="tipo" type="radio" value="Sobra" required class="h-4 w-4 text-slate-600 focus:ring-slate-500 border-slate-300">
+                                        <label for="tipo-sobra" class="ml-3 text-sm font-medium text-slate-700">Sobra</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <button type="submit" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl">
+                                    Cadastrar Material
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <section id="section-inventario" class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-slate-800">Inventário de Estoque</h2>
+                            <p class="text-slate-600 mt-2">Gerencie seus materiais e sobras</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="md:col-span-2">
+                                <input type="text" id="search-nome" placeholder="Pesquisar por nome do MDF" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                            </div>
+                            <div>
+                                <input type="number" id="search-espessura" placeholder="Filtrar por espessura" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="filter-btn" class="flex-1 bg-slate-600 hover:bg-slate-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                                    Filtrar
+                                </button>
+                                <button id="clear-filter-btn" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-3 px-4 rounded-lg transition-colors">
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Nome do MDF</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Comprimento</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Largura</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Espessura</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Localização</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Quantidade</th>
+                                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body" class="bg-white divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-utilizacao" class="space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 space-y-4 md:space-y-0">
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">Lista de Utilização</h2>
+                                <p class="text-slate-600 mt-2">Sobras prontas para utilização</p>
+                            </div>
+                            <div class="flex space-x-3 no-print">
+                                <button id="print-btn" class="flex items-center px-5 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                    </svg>
+                                    Imprimir Lista
+                                </button>
+                                <button id="clear-list-btn" class="flex items-center px-5 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Limpar Lista
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="print-area">
+                            <div class="print-only hidden">
+                                <div class="text-center mb-8">
+                                    <h1 class="text-3xl font-bold text-black mb-2">LISTA DE UTILIZAÇÃO - SOBRAS MADA</h1>
+                                    <p class="text-lg text-black">Data: <span id="print-date"></span></p>
+                                    <hr class="mt-4 border-black">
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50">
+                                        <tr>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Nome do MDF</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Comprimento</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Largura</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Espessura</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Localização</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Quantidade</th>
+                                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Data Utilização</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="utilizacao-table-body" class="bg-white divide-y divide-slate-200">
+                                        <tr>
+                                            <td colspan="7" class="px-6 py-12 text-center text-slate-500">Nenhuma sobra na lista de utilização.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para editar quantidade de chapas -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-6 border w-96 shadow-xl rounded-xl bg-white">
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-slate-800">Editar Quantidade</h3>
+                <p class="text-slate-600 text-sm mt-1">Altere a quantidade do material</p>
+            </div>
+            <div class="mb-6">
+                <label for="edit-quantity" class="block text-sm font-semibold text-slate-700 mb-2">Nova Quantidade:</label>
+                <input type="number" id="edit-quantity" min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors">
+            </div>
+            <div class="space-y-3">
+                <button id="save-quantity-btn" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors shadow-sm">
+                    Salvar Alteração
+                </button>
+                <button id="cancel-edit-btn" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -156,16 +326,23 @@
 
         const form = document.getElementById('material-form');
         const inventoryTableBody = document.getElementById('inventory-table-body');
+        const utilizacaoTableBody = document.getElementById('utilizacao-table-body');
         const searchNomeInput = document.getElementById('search-nome');
         const searchEspessuraInput = document.getElementById('search-espessura');
         const tabCadastroBtn = document.getElementById('tab-cadastro');
         const tabInventarioBtn = document.getElementById('tab-inventario');
+        const tabUtilizacaoBtn = document.getElementById('tab-utilizacao');
         const sectionCadastro = document.getElementById('section-cadastro');
         const sectionInventario = document.getElementById('section-inventario');
+        const sectionUtilizacao = document.getElementById('section-utilizacao');
         const statusMessage = document.getElementById('status-message');
+        const editModal = document.getElementById('edit-modal');
+        const editQuantityInput = document.getElementById('edit-quantity');
 
         let userId = null;
         let inventory = [];
+        let utilizacaoList = [];
+        let currentEditingItem = null;
 
         signInAnonymously(auth).catch(console.error);
 
@@ -174,6 +351,7 @@
                 userId=user.uid;
                 document.getElementById('user-id').textContent=userId;
                 listenInventory();
+                listenUtilizacao();
             }else{
                 document.getElementById('user-id').textContent='Não Autenticado';
             }
@@ -185,6 +363,15 @@
                 inventory=[];
                 snapshot.forEach(docSnap=>inventory.push({id:docSnap.id,...docSnap.data()}));
                 renderInventory();
+            });
+        }
+
+        function listenUtilizacao(){
+            const colRef=collection(db,'artifacts/default-app-id/public/data/utilizacao');
+            onSnapshot(colRef,(snapshot)=>{
+                utilizacaoList=[];
+                snapshot.forEach(docSnap=>utilizacaoList.push({id:docSnap.id,...docSnap.data()}));
+                renderUtilizacao();
             });
         }
         
@@ -199,28 +386,82 @@
                 }
             }
 
-            // Ação para o botão ATUALIZAR
-            if (e.target.classList.contains('update-btn')) {
+            // Ação para o botão EDITAR QUANTIDADE (chapas)
+            if (e.target.classList.contains('edit-btn')) {
                 const id = e.target.dataset.id;
-                const itemToUpdate = inventory.find(item => item.id === id);
-                
-                if (itemToUpdate) {
-                    const currentQuantity = itemToUpdate.quantidade;
-                    const quantityUsed = prompt(`Quantidade a ser utilizada (atual: ${currentQuantity}):`);
-
-                    if (quantityUsed !== null && !isNaN(quantityUsed) && quantityUsed.trim() !== '') {
-                        const newQuantity = currentQuantity - parseInt(quantityUsed);
-                        if (newQuantity >= 0) {
-                            const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
-                            await updateDoc(docRef, { quantidade: newQuantity });
-                            showStatus('Material atualizado com sucesso!', 'bg-green-100 text-green-700');
-                        } else {
-                            showStatus('A quantidade utilizada não pode ser maior que a quantidade atual.', 'bg-red-100 text-red-700');
-                        }
-                    } else if (quantityUsed !== null) {
-                        showStatus('Entrada inválida. Tente novamente.', 'bg-red-100 text-red-700');
-                    }
+                currentEditingItem = inventory.find(item => item.id === id);
+                if (currentEditingItem) {
+                    editQuantityInput.value = currentEditingItem.quantidade;
+                    editModal.classList.remove('hidden');
                 }
+            }
+
+            // Ação para o botão UTILIZAR (sobras)
+            if (e.target.classList.contains('utilize-btn')) {
+                const id = e.target.dataset.id;
+                const itemToUtilize = inventory.find(item => item.id === id);
+                
+                if (itemToUtilize && confirm('Tem certeza de que deseja mover esta sobra para a lista de utilização?')) {
+                    // Adicionar à lista de utilização
+                    const utilizacaoData = {
+                        ...itemToUtilize,
+                        dataUtilizacao: new Date().toLocaleDateString('pt-BR'),
+                        originalId: itemToUtilize.id
+                    };
+                    delete utilizacaoData.id;
+                    
+                    await addDoc(collection(db, 'artifacts/default-app-id/public/data/utilizacao'), utilizacaoData);
+                    
+                    // Remover do inventário
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
+                    await deleteDoc(docRef);
+                    
+                    showStatus('Sobra movida para lista de utilização!', 'bg-blue-100 text-blue-700');
+                }
+            }
+        });
+
+        // Modal de edição
+        document.getElementById('save-quantity-btn').addEventListener('click', async () => {
+            if (currentEditingItem) {
+                const newQuantity = parseInt(editQuantityInput.value);
+                if (newQuantity >= 0) {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', currentEditingItem.id);
+                    await updateDoc(docRef, { quantidade: newQuantity });
+                    showStatus('Quantidade atualizada com sucesso!', 'bg-green-100 text-green-700');
+                    editModal.classList.add('hidden');
+                    currentEditingItem = null;
+                } else {
+                    showStatus('A quantidade deve ser maior ou igual a zero.', 'bg-red-100 text-red-700');
+                }
+            }
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            currentEditingItem = null;
+        });
+
+        // Botões da lista de utilização
+        document.getElementById('print-btn').addEventListener('click', () => {
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('pt-BR');
+            document.querySelector('.print-only').classList.remove('hidden');
+            window.print();
+            document.querySelector('.print-only').classList.add('hidden');
+        });
+
+        document.getElementById('clear-list-btn').addEventListener('click', async () => {
+            if (utilizacaoList.length === 0) {
+                showStatus('Lista já está vazia.', 'bg-yellow-100 text-yellow-700');
+                return;
+            }
+            
+            if (confirm('Tem certeza de que deseja limpar toda a lista de utilização? Esta ação não pode ser desfeita.')) {
+                for (const item of utilizacaoList) {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/utilizacao', item.id);
+                    await deleteDoc(docRef);
+                }
+                showStatus('Lista de utilização limpa com sucesso!', 'bg-green-100 text-green-700');
             }
         });
 
@@ -261,41 +502,87 @@
             const filtered=inventory.filter(i=>i.nome.toLowerCase().includes(term)&&(isNaN(esp)||i.espessura===esp));
             inventoryTableBody.innerHTML='';
             if(filtered.length===0){
-                inventoryTableBody.innerHTML=`<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Nenhum material encontrado.</td></tr>`;
+                inventoryTableBody.innerHTML=`<tr><td colspan="8" class="px-6 py-8 text-center text-slate-500">Nenhum material encontrado.</td></tr>`;
                 return;
             }
             filtered.forEach(item=>{
                 const tr=document.createElement('tr');
-                tr.className='hover:bg-gray-50 transition-colors';
+                tr.className='hover:bg-slate-50 transition-colors';
                 tr.innerHTML=`
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.nome}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.comprimento}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.largura}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.espessura}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.localizacao || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.tipo}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.quantidade}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    ${item.tipo==='Chapa'?`<button class="text-gray-600 hover:text-gray-900 mr-2 update-btn" data-id="${item.id}">Atualizar</button>`:`<button class="text-red-600 hover:text-red-900 delete-btn" data-id="${item.id}">Excluir</button>`}
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">${item.nome}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.comprimento}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.largura}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.espessura}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.localizacao || '-'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${item.tipo === 'Chapa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">${item.tipo}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">${item.quantidade}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                    ${item.tipo==='Chapa'?`<button class="inline-flex items-center px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors edit-btn" data-id="${item.id}">Editar Qtd</button>`:`<button class="inline-flex items-center px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded-lg transition-colors mr-1 utilize-btn" data-id="${item.id}">Utilizar</button><button class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-lg transition-colors delete-btn" data-id="${item.id}">Excluir</button>`}
                 </td>`;
                 inventoryTableBody.appendChild(tr);
             });
         }
 
+        function renderUtilizacao(){
+            utilizacaoTableBody.innerHTML='';
+            if(utilizacaoList.length===0){
+                utilizacaoTableBody.innerHTML=`<tr><td colspan="7" class="px-6 py-12 text-center text-slate-500">Nenhuma sobra na lista de utilização.</td></tr>`;
+                return;
+            }
+            utilizacaoList.forEach(item=>{
+                const tr=document.createElement('tr');
+                tr.className='hover:bg-slate-50 transition-colors';
+                tr.innerHTML=`
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">${item.nome}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600">${item.comprimento}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600">${item.largura}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600">${item.espessura}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600">${item.localizacao || '-'}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">${item.quantidade}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600">${new Date(item.dataUtilizacao).toLocaleDateString('pt-BR')}</td>`;
+                utilizacaoTableBody.appendChild(tr);
+            });
+        }
+
         function switchTab(tab){
-            if(tab==='cadastro'){sectionCadastro.classList.remove('hidden');sectionInventario.classList.add('hidden');tabCadastroBtn.classList.add('border-gray-900','text-gray-900');tabInventarioBtn.classList.remove('border-gray-900','text-gray-900');}
-            else{sectionCadastro.classList.add('hidden');sectionInventario.classList.remove('hidden');tabInventarioBtn.classList.add('border-gray-900','text-gray-900');tabCadastroBtn.classList.remove('border-gray-900','text-gray-900');}
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Hide all sections
+            sectionCadastro.classList.add('hidden');
+            sectionInventario.classList.add('hidden');
+            sectionUtilizacao.classList.add('hidden');
+            
+            // Show selected section and activate corresponding sidebar item
+            if(tab === 'cadastro') {
+                sectionCadastro.classList.remove('hidden');
+                tabCadastroBtn.classList.add('active');
+            } else if(tab === 'inventario') {
+                sectionInventario.classList.remove('hidden');
+                tabInventarioBtn.classList.add('active');
+            } else if(tab === 'utilizacao') {
+                sectionUtilizacao.classList.remove('hidden');
+                tabUtilizacaoBtn.classList.add('active');
+            }
         }
 
         tabCadastroBtn.addEventListener('click',()=>switchTab('cadastro'));
         tabInventarioBtn.addEventListener('click',()=>switchTab('inventario'));
+        tabUtilizacaoBtn.addEventListener('click',()=>switchTab('utilizacao'));
 
         function showStatus(msg,cls){
             statusMessage.textContent=msg;
-            statusMessage.className=`p-3 rounded-lg font-medium ${cls}`;
+            statusMessage.className=`mb-6 p-4 rounded-lg font-medium ${cls}`;
             statusMessage.classList.remove('hidden');
             setTimeout(()=>statusMessage.classList.add('hidden'),3000);
         }
+
+        // Inicializar na aba inventário
+        switchTab('inventario');
     </script>
 </body>
 </html>
