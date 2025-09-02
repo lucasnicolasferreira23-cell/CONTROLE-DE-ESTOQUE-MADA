@@ -187,7 +187,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmAzyTEXnwJk2Kh9-yw1tboka9NRhY81M",
@@ -295,7 +295,9 @@
             if (e.target.classList.contains('utilizar-btn')) {
                 const itemToUtilize = inventory.find(item => item.id === id);
                 if (itemToUtilize) {
-                    await addDoc(printListColRef, { ...itemToUtilize, originalId: id });
+                    // Crie um novo objeto sem o ID original para evitar conflito
+                    const { id, ...itemToSave } = itemToUtilize;
+                    await addDoc(printListColRef, { ...itemToSave, originalId: id });
                     showStatus('Material adicionado à lista de impressão!', 'bg-blue-100 text-blue-700');
                     switchTab('impressao');
                 }
