@@ -125,9 +125,7 @@
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <!-- Layout Principal -->
     <div class="flex min-h-screen flex-col md:flex-row">
-        <!-- Sidebar -->
         <div class="sidebar w-full md:w-64 bg-gray-950 text-white shadow-lg no-print">
             <div class="p-4 md:p-6">
                 <h1 class="text-lg md:text-xl font-bold text-gray-100">CONTROLE DE ESTOQUE</h1>
@@ -178,6 +176,16 @@
                                 </span>
                             </button>
                         </li>
+                        <li>
+                            <button id="tab-compras" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.182 1.996.809 1.996h12.583a2 2 0 002-2c0-.663-.099-1.298-.282-1.895M10 21a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                                    </svg>
+                                    Compras
+                                </span>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -189,7 +197,6 @@
             </div>
         </div>
 
-        <!-- Conteúdo Principal -->
         <div class="main-content flex-1 flex flex-col">
             <header class="bg-white px-4 md:px-8 py-4 md:py-6 no-print shadow-sm">
                 <div class="flex items-center justify-between">
@@ -309,6 +316,7 @@
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Localização</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Tipo</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Quantidade</th>
+                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Data Cadastro</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Status</th>
                                         <th class="px-3 md:px-6 py-3 md:py-4 text-right text-xs font-semibold text-gray-800 uppercase tracking-wider">Ações</th>
                                     </tr>
@@ -392,7 +400,7 @@
                                 <div class="text-sm md:text-base text-gray-700">Material Mais Usado</div>
                             </div>
                             <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="economia-mes">0%</div>
+                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="aproveitamento-valor">0%</div>
                                 <div class="text-sm md:text-base text-gray-700">Aproveitamento</div>
                             </div>
                             <div class="bg-gray-100 rounded-lg p-4 md:p-6">
@@ -401,7 +409,6 @@
                             </div>
                         </div>
 
-                        <!-- Controles dos Gráficos -->
                         <div class="flex flex-wrap gap-4 mb-6">
                             <select id="chart-period" class="px-4 py-2 bg-gray-100 rounded-lg">
                                 <option value="7">Últimos 7 dias</option>
@@ -415,7 +422,6 @@
                             </select>
                         </div>
 
-                        <!-- Gráfico Principal -->
                         <div class="bg-gray-100 rounded-lg p-4 md:p-6 mb-6">
                             <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Gráfico de Utilização</h3>
                             <div class="chart-container">
@@ -423,7 +429,6 @@
                             </div>
                         </div>
 
-                        <!-- Ranking de Materiais -->
                         <div class="bg-gray-100 rounded-lg p-4 md:p-6">
                             <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Ranking de Materiais</h3>
                             <div id="ranking-materiais" class="space-y-3">
@@ -431,7 +436,6 @@
                             </div>
                         </div>
 
-                        <!-- Relatório Mensal -->
                         <div class="bg-gray-100 rounded-lg p-4 md:p-6 mt-6">
                             <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Relatório Mensal</h3>
                             <div id="monthly-report" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -440,11 +444,56 @@
                         </div>
                     </div>
                 </section>
+                
+                <section id="section-compras" class="space-y-4 md:space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-4 md:mb-6">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Controle de Compras</h2>
+                            <p class="text-gray-700 mt-2">Cadastre e gerencie as compras por cliente</p>
+                        </div>
+
+                        <div id="compra-form-container" class="mb-6 md:mb-8">
+                             <form id="compra-form" class="space-y-4">
+                                <h3 class="text-lg font-bold text-gray-900">Nova Compra</h3>
+                                <div>
+                                    <label for="cliente-nome" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO CLIENTE</label>
+                                    <input type="text" id="cliente-nome" required class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="cliente-ambientes" class="block text-sm font-semibold text-gray-900 mb-2">AMBIENTES</label>
+                                    <input type="text" id="cliente-ambientes" placeholder="Ex: Cozinha, Sala, Quarto" required class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <button type="submit" class="btn-primary bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg">
+                                    Cadastrar Compra
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div id="lista-compras-container" class="space-y-6">
+                            <h3 class="text-lg font-bold text-gray-900">Lista de Compras</h3>
+                             <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
+                                <div class="md:col-span-2">
+                                    <input type="text" id="search-cliente" placeholder="Buscar por nome do cliente..." class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button id="filter-cliente-btn" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                        Filtrar
+                                    </button>
+                                    <button id="clear-cliente-filter-btn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-950 font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="compras-list" class="space-y-6">
+                                <div class="text-gray-700 text-center py-6 md:py-8">Nenhuma compra cadastrada.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
 
-    <!-- Modal para editar quantidade -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
             <div class="mb-4 md:mb-6">
@@ -463,6 +512,37 @@
                     Cancelar
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
+            <div class="mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Adicionar Material</h3>
+                <p class="text-gray-700 text-sm mt-1">Adicione um novo item a esta compra</p>
+            </div>
+            <form id="add-item-form" class="space-y-4">
+                <div>
+                    <label for="add-item-nome" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO MDF</label>
+                    <input type="text" id="add-item-nome" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div>
+                    <label for="add-item-espessura" class="block text-sm font-semibold text-gray-900 mb-2">ESPESSURA (mm)</label>
+                    <input type="number" id="add-item-espessura" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div>
+                    <label for="add-item-quantidade" class="block text-sm font-semibold text-gray-900 mb-2">QUANTIDADE</label>
+                    <input type="number" id="add-item-quantidade" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div class="space-y-3 mt-4">
+                    <button type="submit" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                        Adicionar Item
+                    </button>
+                    <button type="button" id="cancel-add-item-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -494,20 +574,31 @@
         const tabInventarioBtn = document.getElementById('tab-inventario');
         const tabUtilizacaoBtn = document.getElementById('tab-utilizacao');
         const tabAproveitamentoBtn = document.getElementById('tab-aproveitamento');
+        const tabComprasBtn = document.getElementById('tab-compras');
         const sectionCadastro = document.getElementById('section-cadastro');
         const sectionInventario = document.getElementById('section-inventario');
         const sectionUtilizacao = document.getElementById('section-utilizacao');
         const sectionAproveitamento = document.getElementById('section-aproveitamento');
+        const sectionCompras = document.getElementById('section-compras');
         const statusMessage = document.getElementById('status-message');
         const editModal = document.getElementById('edit-modal');
         const editQuantityInput = document.getElementById('edit-quantity');
         const loadingMessage = document.getElementById('loading-message');
+        const aproveitamentoValor = document.getElementById('aproveitamento-valor');
+
+        // New elements for Compras
+        const compraForm = document.getElementById('compra-form');
+        const comprasListEl = document.getElementById('compras-list');
+        const searchClienteInput = document.getElementById('search-cliente');
+        const filterClienteBtn = document.getElementById('filter-cliente-btn');
+        const clearClienteFilterBtn = document.getElementById('clear-cliente-filter-btn');
 
         let userId = null;
         let inventory = [];
         let utilizacaoList = [];
         let currentEditingItem = null;
         let chart = null;
+        let compras = [];
 
         signInAnonymously(auth).catch(console.error);
 
@@ -517,6 +608,8 @@
                 document.getElementById('user-id').textContent = userId;
                 listenInventory();
                 listenUtilizacao();
+                loadComprasFromStorage();
+                loadAproveitamentoFromStorage();
                 setTimeout(() => {
                     loadingMessage.style.display = 'none';
                 }, 1000);
@@ -525,6 +618,31 @@
             }
         });
 
+        // Local Storage for Aproveitamento
+        function loadAproveitamentoFromStorage() {
+            const storedAproveitamento = localStorage.getItem('aproveitamentoData');
+            if (storedAproveitamento) {
+                const data = JSON.parse(storedAproveitamento);
+                document.getElementById('total-utilizacoes').textContent = data.totalUtilizacoes || 0;
+                aproveitamentoValor.textContent = data.aproveitamento || '0%';
+            }
+        }
+
+        function saveAproveitamentoToStorage() {
+            const data = {
+                totalUtilizacoes: document.getElementById('total-utilizacoes').textContent,
+                aproveitamento: aproveitamentoValor.textContent
+            };
+            localStorage.setItem('aproveitamentoData', JSON.stringify(data));
+        }
+
+        function getFormattedDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('pt-BR');
+            const time = now.toLocaleTimeString('pt-BR');
+            return `${date} ${time}`;
+        }
+        
         function listenInventory(){
             const colRef = collection(db, 'artifacts/default-app-id/public/data/inventory');
             onSnapshot(colRef, (snapshot) => {
@@ -548,6 +666,7 @@
                 renderUtilizacao();
                 renderAproveitamento();
                 updateCharts();
+                saveAproveitamentoToStorage();
             });
         }
 
@@ -589,7 +708,7 @@
                 if (itemToUtilize && confirm('Tem certeza de que deseja mover esta sobra para a lista de utilização?')) {
                     const utilizacaoData = {
                         ...itemToUtilize,
-                        dataUtilizacao: new Date().toLocaleDateString('pt-BR'),
+                        dataUtilizacao: getFormattedDateTime(),
                         timestamp: new Date().toISOString(),
                         originalId: itemToUtilize.id
                     };
@@ -677,7 +796,7 @@
                     quantidade: parseInt(form.quantidade.value),
                     tipo: form.tipo.value,
                     localizacao: form.localizacao.value || 'Não informada',
-                    timestamp: new Date().toISOString()
+                    dataCadastro: getFormattedDateTime()
                 };
                 
                 await addDoc(collection(db, 'artifacts/default-app-id/public/data/inventory'), data);
@@ -701,7 +820,7 @@
             inventoryTableBody.innerHTML = '';
             
             if(filtered.length === 0){
-                inventoryTableBody.innerHTML = `<tr><td colspan="9" class="px-3 md:px-6 py-6 md:py-8 text-center text-gray-700">Nenhum material encontrado.</td></tr>`;
+                inventoryTableBody.innerHTML = `<tr><td colspan="10" class="px-3 md:px-6 py-6 md:py-8 text-center text-gray-700">Nenhum material encontrado.</td></tr>`;
                 return;
             }
             
@@ -718,6 +837,7 @@
                     <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${item.tipo === 'Chapa' ? 'bg-gray-800 text-white' : 'bg-gray-300 text-gray-950'}">${item.tipo}</span>
                 </td>
                 <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
+                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.dataCadastro}</td>
                 <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">${getStatusBadge(item.quantidade, item.tipo)}</td>
                 <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-right text-sm space-x-1">
                     <button class="inline-flex items-center px-2 md:px-3 py-1 md:py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors edit-btn" data-id="${item.id}">Editar</button>
@@ -754,12 +874,15 @@
             document.getElementById('total-utilizacoes').textContent = totalUtilizacoes;
 
             const hoje = new Date().toLocaleDateString('pt-BR');
-            const utilizacoesHoje = utilizacaoList.filter(item => item.dataUtilizacao === hoje).length;
+            const utilizacoesHoje = utilizacaoList.filter(item => {
+                const itemDate = new Date(item.timestamp);
+                return itemDate.toLocaleDateString('pt-BR') === hoje;
+            }).length;
             document.getElementById('utilizacoes-hoje').textContent = utilizacoesHoje;
 
             if (totalUtilizacoes === 0) {
                 document.getElementById('material-mais-usado').textContent = '-';
-                document.getElementById('economia-mes').textContent = '0%';
+                aproveitamentoValor.textContent = '0%';
                 document.getElementById('ranking-materiais').innerHTML = 
                     '<div class="text-gray-700 text-center py-6 md:py-8">Nenhum dado de utilização disponível.</div>';
                 document.getElementById('monthly-report').innerHTML = 
@@ -779,8 +902,10 @@
 
             document.getElementById('material-mais-usado').textContent = materialMaisUsado;
 
-            const aproveitamento = Math.min(95, Math.round((totalUtilizacoes / (totalUtilizacoes + inventory.length)) * 100));
-            document.getElementById('economia-mes').textContent = `${aproveitamento}%`;
+            // Simple calculation for Aproveitamento based on counts, for demonstration
+            const totalItems = totalUtilizacoes + inventory.length;
+            const aproveitamento = totalItems > 0 ? (totalUtilizacoes / totalItems) * 100 : 0;
+            aproveitamentoValor.textContent = `${aproveitamento.toFixed(2)}%`;
 
             const ranking = Object.entries(contadorMateriais)
                 .sort(([,a], [,b]) => b - a)
@@ -807,14 +932,12 @@
             const thisYear = now.getFullYear();
             
             const utilizacoesThisMonth = utilizacaoList.filter(item => {
-                if (!item.timestamp) return false;
                 const itemDate = new Date(item.timestamp);
                 return itemDate.getMonth() === thisMonth && itemDate.getFullYear() === thisYear;
             });
 
             const lastMonth = new Date(thisYear, thisMonth - 1);
             const utilizacoesLastMonth = utilizacaoList.filter(item => {
-                if (!item.timestamp) return false;
                 const itemDate = new Date(item.timestamp);
                 return itemDate.getMonth() === lastMonth.getMonth() && itemDate.getFullYear() === lastMonth.getFullYear();
             });
@@ -871,7 +994,10 @@
                 const dateStr = date.toLocaleDateString('pt-BR');
                 labels.push(dateStr);
                 
-                const count = utilizacaoList.filter(item => item.dataUtilizacao === dateStr).length;
+                const count = utilizacaoList.filter(item => {
+                    const itemDate = new Date(item.timestamp);
+                    return itemDate.toLocaleDateString('pt-BR') === dateStr;
+                }).length;
                 data.push(count);
             }
             
@@ -1001,6 +1127,7 @@
             sectionInventario.classList.add('hidden');
             sectionUtilizacao.classList.add('hidden');
             sectionAproveitamento.classList.add('hidden');
+            sectionCompras.classList.add('hidden');
             
             if(tab === 'cadastro') {
                 sectionCadastro.classList.remove('hidden');
@@ -1015,6 +1142,10 @@
                 sectionAproveitamento.classList.remove('hidden');
                 tabAproveitamentoBtn.classList.add('active');
                 setTimeout(updateCharts, 100);
+            } else if (tab === 'compras') {
+                sectionCompras.classList.remove('hidden');
+                tabComprasBtn.classList.add('active');
+                renderCompras();
             }
         }
 
@@ -1022,6 +1153,7 @@
         tabInventarioBtn.addEventListener('click', () => switchTab('inventario'));
         tabUtilizacaoBtn.addEventListener('click', () => switchTab('utilizacao'));
         tabAproveitamentoBtn.addEventListener('click', () => switchTab('aproveitamento'));
+        tabComprasBtn.addEventListener('click', () => switchTab('compras'));
 
         function showStatus(msg, cls){
             statusMessage.textContent = msg;
@@ -1029,6 +1161,160 @@
             statusMessage.classList.remove('hidden');
             setTimeout(() => statusMessage.classList.add('hidden'), 3000);
         }
+
+        // --- Novas funções para o menu de Compras ---
+        function loadComprasFromStorage() {
+            const storedCompras = localStorage.getItem('compras');
+            if (storedCompras) {
+                compras = JSON.parse(storedCompras);
+            }
+        }
+
+        function saveComprasToStorage() {
+            localStorage.setItem('compras', JSON.stringify(compras));
+        }
+
+        function renderCompras(filterTerm = '') {
+            comprasListEl.innerHTML = '';
+            const filteredCompras = compras.filter(c => c.cliente.nome.toLowerCase().includes(filterTerm.toLowerCase()));
+
+            if (filteredCompras.length === 0) {
+                comprasListEl.innerHTML = '<div class="text-gray-700 text-center py-6 md:py-8">Nenhuma compra encontrada.</div>';
+                return;
+            }
+
+            filteredCompras.forEach((compra, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'bg-white rounded-xl shadow-sm p-4 md:p-8 space-y-4';
+                
+                const materiaisList = compra.materiais.map((material, matIndex) => `
+                    <li class="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm md:text-base font-medium text-gray-800">${material.nome} - ${material.espessura}mm</span>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" value="${material.quantidade}" 
+                                class="w-16 text-center text-sm md:text-base bg-gray-200 rounded-md p-1"
+                                onchange="updateItemQuantity(${index}, ${matIndex}, this.value)">
+                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra(${index}, ${matIndex})">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
+
+                itemDiv.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2 mb-2">
+                        <h4 class="text-lg md:text-xl font-bold text-gray-900">${compra.cliente.nome}</h4>
+                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra(${index})">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                             </svg>
+                         </button>
+                    </div>
+                    <p class="text-sm text-gray-700"><strong>Ambientes:</strong> ${compra.cliente.ambientes}</p>
+                    <p class="text-sm text-gray-500">Cadastrado em: ${compra.dataHora}</p>
+                    <ul class="space-y-2 mt-4">
+                        ${materiaisList}
+                    </ul>
+                    <div class="pt-4">
+                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal(${index})">
+                            Adicionar Material
+                        </button>
+                    </div>
+                `;
+                comprasListEl.appendChild(itemDiv);
+            });
+        }
+
+        compraForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const novaCompra = {
+                id: Date.now().toString(),
+                cliente: {
+                    nome: document.getElementById('cliente-nome').value,
+                    ambientes: document.getElementById('cliente-ambientes').value,
+                },
+                materiais: [],
+                dataHora: getFormattedDateTime()
+            };
+            compras.unshift(novaCompra);
+            saveComprasToStorage();
+            renderCompras();
+            compraForm.reset();
+            showStatus('Compra cadastrada com sucesso!', 'bg-green-100 text-green-700');
+        });
+
+        filterClienteBtn.addEventListener('click', () => {
+            const filterTerm = searchClienteInput.value;
+            renderCompras(filterTerm);
+        });
+
+        clearClienteFilterBtn.addEventListener('click', () => {
+            searchClienteInput.value = '';
+            renderCompras();
+        });
+
+        window.updateItemQuantity = function(compraIndex, itemIndex, newQuantity) {
+            const num = parseInt(newQuantity);
+            if (!isNaN(num) && num >= 0) {
+                compras[compraIndex].materiais[itemIndex].quantidade = num;
+                saveComprasToStorage();
+            } else {
+                renderCompras(); // Re-render to revert invalid input
+            }
+        };
+        
+        window.removeItemFromCompra = function(compraIndex, itemIndex) {
+            if (confirm('Tem certeza que deseja remover este material da compra?')) {
+                compras[compraIndex].materiais.splice(itemIndex, 1);
+                saveComprasToStorage();
+                renderCompras();
+                showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
+            }
+        };
+
+        window.deleteCompra = function(compraIndex) {
+            if (confirm('Tem certeza que deseja excluir esta compra e todos os seus itens?')) {
+                compras.splice(compraIndex, 1);
+                saveComprasToStorage();
+                renderCompras();
+                showStatus('Compra excluída com sucesso!', 'bg-red-100 text-red-700');
+            }
+        };
+
+        let currentCompraIndex = null;
+        const addItemModal = document.getElementById('add-item-modal');
+        const addItemForm = document.getElementById('add-item-form');
+        const cancelAddItemBtn = document.getElementById('cancel-add-item-btn');
+
+        window.openAddItemModal = function(index) {
+            currentCompraIndex = index;
+            addItemModal.classList.remove('hidden');
+        };
+
+        cancelAddItemBtn.addEventListener('click', () => {
+            addItemModal.classList.add('hidden');
+            addItemForm.reset();
+        });
+
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newItem = {
+                nome: document.getElementById('add-item-nome').value,
+                espessura: parseInt(document.getElementById('add-item-espessura').value),
+                quantidade: parseInt(document.getElementById('add-item-quantidade').value)
+            };
+            
+            if (currentCompraIndex !== null) {
+                compras[currentCompraIndex].materiais.push(newItem);
+                saveComprasToStorage();
+                renderCompras();
+                addItemModal.classList.add('hidden');
+                addItemForm.reset();
+                showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
+            }
+        });
 
         switchTab('inventario');
     </script>
