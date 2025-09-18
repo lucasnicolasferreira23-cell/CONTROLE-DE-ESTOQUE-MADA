@@ -550,7 +550,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmAzyTEXnwJk2Kh9-yw1tboka9NRhY81M",
@@ -597,11 +596,9 @@
         let userId = null;
         let inventory = [];
         let utilizacaoList = [];
-        let historicoUtilizacao = []; // Dados para o aproveitamento
-        let compras = [];
         let currentEditingItem = null;
-        let currentCompraId = null;
         let chart = null;
+        let compras = [];
 
         signInAnonymously(auth).catch(console.error);
 
@@ -611,8 +608,8 @@
                 document.getElementById('user-id').textContent = userId;
                 listenInventory();
                 listenUtilizacao();
-                listenHistoricoUtilizacao();
-                listenCompras();
+                loadComprasFromStorage();
+                loadAproveitamentoFromStorage();
                 setTimeout(() => {
                     loadingMessage.style.display = 'none';
                 }, 1000);
@@ -620,6 +617,24 @@
                 document.getElementById('user-id').textContent = 'Não Autenticado';
             }
         });
+
+        // Local Storage for Aproveitamento
+        function loadAproveitamentoFromStorage() {
+            const storedAproveitamento = localStorage.getItem('aproveitamentoData');
+            if (storedAproveitamento) {
+                const data = JSON.parse(storedAproveitamento);
+                document.getElementById('total-utilizacoes').textContent = data.totalUtilizacoes || 0;
+                aproveitamentoValor.textContent = data.aproveitamento || '0%';
+            }
+        }
+
+        function saveAproveitamentoToStorage() {
+            const data = {
+                totalUtilizacoes: document.getElementById('total-utilizacoes').textContent,
+                aproveitamento: aproveitamentoValor.textContent
+            };
+            localStorage.setItem('aproveitamentoData', JSON.stringify(data));
+        }
 
         function getFormattedDateTime() {
             const now = new Date();
@@ -636,31 +651,22 @@
                 renderInventory();
             });
         }
-        
-        // Listen to the temporary "utilizacao" list
+
         function listenUtilizacao(){
             const colRef = collection(db, 'artifacts/default-app-id/public/data/utilizacao');
             onSnapshot(colRef, (snapshot) => {
                 utilizacaoList = [];
                 snapshot.forEach(docSnap => {
                     let data = docSnap.data();
+                    if (!data.timestamp) {
+                        data.timestamp = new Date().toISOString();
+                    }
                     utilizacaoList.push({id: docSnap.id, ...data});
                 });
                 renderUtilizacao();
-            });
-        }
-        
-        // Listen to the permanent "utilizacao-historico" for Aproveitamento tab
-        function listenHistoricoUtilizacao() {
-            const colRef = collection(db, 'artifacts/default-app-id/public/data/utilizacao-historico');
-            onSnapshot(colRef, (snapshot) => {
-                historicoUtilizacao = [];
-                snapshot.forEach(docSnap => {
-                    let data = docSnap.data();
-                    historicoUtilizacao.push({id: docSnap.id, ...data});
-                });
                 renderAproveitamento();
                 updateCharts();
+                saveAproveitamentoToStorage();
             });
         }
 
@@ -677,12 +683,8 @@
         }
 
         inventoryTableBody.addEventListener('click', async (e) => {
-            const target = e.target.closest('button');
-            if (!target) return;
-            
-            const id = target.dataset.id;
-
-            if (target.classList.contains('delete-btn')) {
+            if (e.target.classList.contains('delete-btn')) {
+                const id = e.target.dataset.id;
                 if (confirm('Tem certeza de que deseja excluir este item?')) {
                     const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
                     await deleteDoc(docRef);
@@ -690,7 +692,8 @@
                 }
             }
 
-            if (target.classList.contains('edit-btn')) {
+            if (e.target.classList.contains('edit-btn')) {
+                const id = e.target.dataset.id;
                 currentEditingItem = inventory.find(item => item.id === id);
                 if (currentEditingItem) {
                     editQuantityInput.value = currentEditingItem.quantidade;
@@ -698,7 +701,8 @@
                 }
             }
 
-            if (target.classList.contains('utilize-btn')) {
+            if (e.target.classList.contains('utilize-btn')) {
+                const id = e.target.dataset.id;
                 const itemToUtilize = inventory.find(item => item.id === id);
                 
                 if (itemToUtilize && confirm('Tem certeza de que deseja mover esta sobra para a lista de utilização?')) {
@@ -710,13 +714,8 @@
                     };
                     delete utilizacaoData.id;
                     
-                    // Add to the temporary list
                     await addDoc(collection(db, 'artifacts/default-app-id/public/data/utilizacao'), utilizacaoData);
                     
-                    // Also add to the permanent history
-                    await addDoc(collection(db, 'artifacts/default-app-id/public/data/utilizacao-historico'), utilizacaoData);
-                    
-                    // Delete from inventory
                     const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
                     await deleteDoc(docRef);
                     
@@ -758,13 +757,11 @@
                 return;
             }
             
-            if (confirm('Tem certeza de que deseja limpar toda a lista de utilização?')) {
-                const batch = db.batch();
-                utilizacaoList.forEach(item => {
+            if (confirm('Tem certeza de que deseja limpar toda a lista de utilização? Esta ação não pode ser desfeita.')) {
+                for (const item of utilizacaoList) {
                     const docRef = doc(db, 'artifacts/default-app-id/public/data/utilizacao', item.id);
-                    batch.delete(docRef);
-                });
-                await batch.commit();
+                    await deleteDoc(docRef);
+                }
                 showStatus('Lista de utilização limpa com sucesso!', 'bg-green-100 text-green-700');
             }
         });
@@ -781,6 +778,7 @@
             renderInventory();
         });
 
+        // Corrigindo o botão de cadastrar - melhor tratamento de eventos
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -872,11 +870,11 @@
         }
 
         function renderAproveitamento() {
-            const totalUtilizacoes = historicoUtilizacao.length;
+            const totalUtilizacoes = utilizacaoList.length;
             document.getElementById('total-utilizacoes').textContent = totalUtilizacoes;
 
             const hoje = new Date().toLocaleDateString('pt-BR');
-            const utilizacoesHoje = historicoUtilizacao.filter(item => {
+            const utilizacoesHoje = utilizacaoList.filter(item => {
                 const itemDate = new Date(item.timestamp);
                 return itemDate.toLocaleDateString('pt-BR') === hoje;
             }).length;
@@ -893,7 +891,7 @@
             }
 
             const contadorMateriais = {};
-            historicoUtilizacao.forEach(item => {
+            utilizacaoList.forEach(item => {
                 const key = `${item.nome} ${item.espessura}mm`;
                 contadorMateriais[key] = (contadorMateriais[key] || 0) + item.quantidade;
             });
@@ -904,6 +902,7 @@
 
             document.getElementById('material-mais-usado').textContent = materialMaisUsado;
 
+            // Simple calculation for Aproveitamento based on counts, for demonstration
             const totalItems = totalUtilizacoes + inventory.length;
             const aproveitamento = totalItems > 0 ? (totalUtilizacoes / totalItems) * 100 : 0;
             aproveitamentoValor.textContent = `${aproveitamento.toFixed(2)}%`;
@@ -932,13 +931,13 @@
             const thisMonth = now.getMonth();
             const thisYear = now.getFullYear();
             
-            const utilizacoesThisMonth = historicoUtilizacao.filter(item => {
+            const utilizacoesThisMonth = utilizacaoList.filter(item => {
                 const itemDate = new Date(item.timestamp);
                 return itemDate.getMonth() === thisMonth && itemDate.getFullYear() === thisYear;
             });
 
             const lastMonth = new Date(thisYear, thisMonth - 1);
-            const utilizacoesLastMonth = historicoUtilizacao.filter(item => {
+            const utilizacoesLastMonth = utilizacaoList.filter(item => {
                 const itemDate = new Date(item.timestamp);
                 return itemDate.getMonth() === lastMonth.getMonth() && itemDate.getFullYear() === lastMonth.getFullYear();
             });
@@ -995,7 +994,7 @@
                 const dateStr = date.toLocaleDateString('pt-BR');
                 labels.push(dateStr);
                 
-                const count = historicoUtilizacao.filter(item => {
+                const count = utilizacaoList.filter(item => {
                     const itemDate = new Date(item.timestamp);
                     return itemDate.toLocaleDateString('pt-BR') === dateStr;
                 }).length;
@@ -1038,7 +1037,7 @@
 
         function createMaterialChart(ctx) {
             const materialCount = {};
-            historicoUtilizacao.forEach(item => {
+            utilizacaoList.forEach(item => {
                 const key = `${item.nome} ${item.espessura}mm`;
                 materialCount[key] = (materialCount[key] || 0) + item.quantidade;
             });
@@ -1081,7 +1080,7 @@
 
         function createThicknessChart(ctx) {
             const thicknessCount = {};
-            historicoUtilizacao.forEach(item => {
+            utilizacaoList.forEach(item => {
                 const key = `${item.espessura}mm`;
                 thicknessCount[key] = (thicknessCount[key] || 0) + item.quantidade;
             });
@@ -1163,17 +1162,19 @@
             setTimeout(() => statusMessage.classList.add('hidden'), 3000);
         }
 
-        // --- Firebase Functions for Compras ---
-        function listenCompras() {
-            const colRef = collection(db, 'artifacts/default-app-id/public/data/compras');
-            onSnapshot(colRef, (snapshot) => {
-                compras = [];
-                snapshot.forEach(docSnap => compras.push({id: docSnap.id, ...docSnap.data()}));
-                renderCompras(searchClienteInput.value);
-            });
+        // --- Novas funções para o menu de Compras ---
+        function loadComprasFromStorage() {
+            const storedCompras = localStorage.getItem('compras');
+            if (storedCompras) {
+                compras = JSON.parse(storedCompras);
+            }
         }
 
-        async function renderCompras(filterTerm = '') {
+        function saveComprasToStorage() {
+            localStorage.setItem('compras', JSON.stringify(compras));
+        }
+
+        function renderCompras(filterTerm = '') {
             comprasListEl.innerHTML = '';
             const filteredCompras = compras.filter(c => c.cliente.nome.toLowerCase().includes(filterTerm.toLowerCase()));
 
@@ -1182,7 +1183,7 @@
                 return;
             }
 
-            filteredCompras.forEach((compra) => {
+            filteredCompras.forEach((compra, index) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bg-white rounded-xl shadow-sm p-4 md:p-8 space-y-4';
                 
@@ -1192,8 +1193,8 @@
                         <div class="flex items-center space-x-2">
                             <input type="number" value="${material.quantidade}" 
                                 class="w-16 text-center text-sm md:text-base bg-gray-200 rounded-md p-1"
-                                onchange="updateItemQuantity('${compra.id}', ${matIndex}, this.value)">
-                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra('${compra.id}', ${matIndex})">
+                                onchange="updateItemQuantity(${index}, ${matIndex}, this.value)">
+                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra(${index}, ${matIndex})">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -1205,7 +1206,7 @@
                 itemDiv.innerHTML = `
                     <div class="flex justify-between items-center border-b pb-2 mb-2">
                         <h4 class="text-lg md:text-xl font-bold text-gray-900">${compra.cliente.nome}</h4>
-                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra('${compra.id}')">
+                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra(${index})">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                              </svg>
@@ -1217,7 +1218,7 @@
                         ${materiaisList}
                     </ul>
                     <div class="pt-4">
-                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
+                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal(${index})">
                             Adicionar Material
                         </button>
                     </div>
@@ -1226,9 +1227,10 @@
             });
         }
 
-        compraForm.addEventListener('submit', async (e) => {
+        compraForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const novaCompra = {
+                id: Date.now().toString(),
                 cliente: {
                     nome: document.getElementById('cliente-nome').value,
                     ambientes: document.getElementById('cliente-ambientes').value,
@@ -1236,7 +1238,9 @@
                 materiais: [],
                 dataHora: getFormattedDateTime()
             };
-            await addDoc(collection(db, 'artifacts/default-app-id/public/data/compras'), novaCompra);
+            compras.unshift(novaCompra);
+            saveComprasToStorage();
+            renderCompras();
             compraForm.reset();
             showStatus('Compra cadastrada com sucesso!', 'bg-green-100 text-green-700');
         });
@@ -1251,45 +1255,41 @@
             renderCompras();
         });
 
-        window.updateItemQuantity = async function(compraId, itemIndex, newQuantity) {
+        window.updateItemQuantity = function(compraIndex, itemIndex, newQuantity) {
             const num = parseInt(newQuantity);
-            const compra = compras.find(c => c.id === compraId);
-            if (!isNaN(num) && num >= 0 && compra) {
-                compra.materiais[itemIndex].quantidade = num;
-                const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
-                await updateDoc(docRef, { materiais: compra.materiais });
+            if (!isNaN(num) && num >= 0) {
+                compras[compraIndex].materiais[itemIndex].quantidade = num;
+                saveComprasToStorage();
             } else {
                 renderCompras(); // Re-render to revert invalid input
             }
         };
         
-        window.removeItemFromCompra = async function(compraId, itemIndex) {
+        window.removeItemFromCompra = function(compraIndex, itemIndex) {
             if (confirm('Tem certeza que deseja remover este material da compra?')) {
-                const compra = compras.find(c => c.id === compraId);
-                if (compra) {
-                    compra.materiais.splice(itemIndex, 1);
-                    const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
-                    await updateDoc(docRef, { materiais: compra.materiais });
-                    showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
-                }
+                compras[compraIndex].materiais.splice(itemIndex, 1);
+                saveComprasToStorage();
+                renderCompras();
+                showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
             }
         };
 
-        window.deleteCompra = async function(compraId) {
+        window.deleteCompra = function(compraIndex) {
             if (confirm('Tem certeza que deseja excluir esta compra e todos os seus itens?')) {
-                const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
-                await deleteDoc(docRef);
+                compras.splice(compraIndex, 1);
+                saveComprasToStorage();
+                renderCompras();
                 showStatus('Compra excluída com sucesso!', 'bg-red-100 text-red-700');
             }
         };
 
-        let currentCompraIdForModal = null;
+        let currentCompraIndex = null;
         const addItemModal = document.getElementById('add-item-modal');
         const addItemForm = document.getElementById('add-item-form');
         const cancelAddItemBtn = document.getElementById('cancel-add-item-btn');
 
-        window.openAddItemModal = function(compraId) {
-            currentCompraIdForModal = compraId;
+        window.openAddItemModal = function(index) {
+            currentCompraIndex = index;
             addItemModal.classList.remove('hidden');
         };
 
@@ -1298,7 +1298,7 @@
             addItemForm.reset();
         });
 
-        addItemForm.addEventListener('submit', async (e) => {
+        addItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const newItem = {
                 nome: document.getElementById('add-item-nome').value,
@@ -1306,16 +1306,13 @@
                 quantidade: parseInt(document.getElementById('add-item-quantidade').value)
             };
             
-            if (currentCompraIdForModal) {
-                const compra = compras.find(c => c.id === currentCompraIdForModal);
-                if (compra) {
-                    compra.materiais.push(newItem);
-                    const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', currentCompraIdForModal);
-                    await updateDoc(docRef, { materiais: compra.materiais });
-                    addItemModal.classList.add('hidden');
-                    addItemForm.reset();
-                    showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
-                }
+            if (currentCompraIndex !== null) {
+                compras[currentCompraIndex].materiais.push(newItem);
+                saveComprasToStorage();
+                renderCompras();
+                addItemModal.classList.add('hidden');
+                addItemForm.reset();
+                showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
             }
         });
 
@@ -1323,3 +1320,4 @@
     </script>
 </body>
 </html>
+
