@@ -36,7 +36,6 @@
             background-color: #f3f4f6; 
         }
         
-        /* Reset básico para evitar linhas indesejadas */
         * {
             box-sizing: border-box;
         }
@@ -76,6 +75,18 @@
             background-color: #f0fdf4;
             color: #16a34a;
         }
+        .status-aguardando {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-cortando {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-finalizado {
+            background-color: #dcfce7;
+            color: #166534;
+        }
         
         @media print {
             body { background: white; margin: 0; padding: 0; }
@@ -83,21 +94,12 @@
             .print-only { display: block; }
         }
         
-        /* Responsividade */
         @media (max-width: 768px) {
             .sidebar { width: 100%; position: relative; }
             .main-content { margin-left: 0; }
             .mobile-hidden { display: none; }
         }
         
-        /* Gráficos */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin: 1rem 0;
-        }
-
-        /* Melhor responsividade para campos */
         .form-input {
             padding: 0.5rem 0.75rem;
             transition: all 0.2s ease;
@@ -109,7 +111,6 @@
             }
         }
 
-        /* Botão melhorado */
         .btn-primary {
             padding: 0.75rem 1rem;
             cursor: pointer;
@@ -167,12 +168,12 @@
                             </button>
                         </li>
                         <li>
-                            <button id="tab-aproveitamento" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                            <button id="tab-plano-corte" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
                                 <span class="flex items-center">
                                     <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
-                                    Aproveitamento
+                                    Plano de Corte
                                 </span>
                             </button>
                         </li>
@@ -275,6 +276,37 @@
                             <div class="pt-4">
                                 <button type="submit" id="cadastrar-btn" class="btn-primary w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-950 focus:ring-opacity-50">
                                     Cadastrar Material
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Nova seção para Plano de Corte -->
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-6 md:mb-8">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Criar Plano de Corte</h2>
+                            <p class="text-gray-700 mt-2">Crie lotes para organizar os cortes</p>
+                        </div>
+                        
+                        <form id="plano-corte-form" class="space-y-4 md:space-y-6">
+                            <div>
+                                <label for="nome-lote" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO LOTE</label>
+                                <input type="text" id="nome-lote" name="nome-lote" placeholder="Ex: LOTE18/09" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
+                            </div>
+
+                            <div>
+                                <label for="cliente-ambiente" class="block text-sm font-semibold text-gray-900 mb-2">CLIENTE/AMBIENTE</label>
+                                <textarea id="cliente-ambiente" name="cliente-ambiente" rows="3" placeholder="Ex: João Silva - Cozinha, Sala" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
+                            </div>
+
+                            <div>
+                                <label for="materiais-lote" class="block text-sm font-semibold text-gray-900 mb-2">MATERIAIS</label>
+                                <textarea id="materiais-lote" name="materiais-lote" rows="3" placeholder="Ex: MDF2F 15mm - 5 chapas, MDF2F 18mm - 3 chapas" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
+                            </div>
+
+                            <div class="pt-4">
+                                <button type="submit" id="salvar-lote-btn" class="btn-primary w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-950 focus:ring-opacity-50">
+                                    Salvar Lote
                                 </button>
                             </div>
                         </form>
@@ -383,64 +415,16 @@
                     </div>
                 </section>
 
-                <section id="section-aproveitamento" class="space-y-4 md:space-y-6 hidden">
+                <!-- Nova seção Plano de Corte -->
+                <section id="section-plano-corte" class="space-y-4 md:space-y-6 hidden">
                     <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
                         <div class="mb-4 md:mb-6">
-                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Relatório de Aproveitamento</h2>
-                            <p class="text-gray-700 mt-2">Análise detalhada dos materiais mais utilizados</p>
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Plano de Corte</h2>
+                            <p class="text-gray-700 mt-2">Gerencie os lotes de corte</p>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-                            <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="total-utilizacoes">0</div>
-                                <div class="text-sm md:text-base text-gray-700">Total Utilizações</div>
-                            </div>
-                            <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="material-mais-usado">-</div>
-                                <div class="text-sm md:text-base text-gray-700">Material Mais Usado</div>
-                            </div>
-                            <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="aproveitamento-valor">0%</div>
-                                <div class="text-sm md:text-base text-gray-700">Aproveitamento</div>
-                            </div>
-                            <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                                <div class="text-2xl md:text-3xl font-bold text-gray-950" id="utilizacoes-hoje">0</div>
-                                <div class="text-sm md:text-base text-gray-700">Hoje</div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-4 mb-6">
-                            <select id="chart-period" class="px-4 py-2 bg-gray-100 rounded-lg">
-                                <option value="7">Últimos 7 dias</option>
-                                <option value="15">Últimos 15 dias</option>
-                                <option value="30">Últimos 30 dias</option>
-                            </select>
-                            <select id="chart-type" class="px-4 py-2 bg-gray-100 rounded-lg">
-                                <option value="daily">Utilização Diária</option>
-                                <option value="materials">Materiais Mais Usados</option>
-                                <option value="thickness">Por Espessura</option>
-                            </select>
-                        </div>
-
-                        <div class="bg-gray-100 rounded-lg p-4 md:p-6 mb-6">
-                            <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Gráfico de Utilização</h3>
-                            <div class="chart-container">
-                                <canvas id="main-chart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-100 rounded-lg p-4 md:p-6">
-                            <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Ranking de Materiais</h3>
-                            <div id="ranking-materiais" class="space-y-3">
-                                <div class="text-gray-700 text-center py-6 md:py-8">Nenhum dado de utilização disponível.</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-100 rounded-lg p-4 md:p-6 mt-6">
-                            <h3 class="text-lg md:text-xl font-semibold text-gray-950 mb-4">Relatório Mensal</h3>
-                            <div id="monthly-report" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="text-gray-700 text-center py-6 md:py-8 col-span-2">Dados mensais serão exibidos aqui.</div>
-                            </div>
+                        <div id="lotes-list" class="space-y-6">
+                            <div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>
                         </div>
                     </div>
                 </section>
@@ -566,6 +550,7 @@
         const db = getFirestore(app);
 
         const form = document.getElementById('material-form');
+        const planoCorteForm = document.getElementById('plano-corte-form');
         const inventoryTableBody = document.getElementById('inventory-table-body');
         const utilizacaoTableBody = document.getElementById('utilizacao-table-body');
         const searchNomeInput = document.getElementById('search-nome');
@@ -573,20 +558,20 @@
         const tabCadastroBtn = document.getElementById('tab-cadastro');
         const tabInventarioBtn = document.getElementById('tab-inventario');
         const tabUtilizacaoBtn = document.getElementById('tab-utilizacao');
-        const tabAproveitamentoBtn = document.getElementById('tab-aproveitamento');
+        const tabPlanoCorteBtn = document.getElementById('tab-plano-corte');
         const tabComprasBtn = document.getElementById('tab-compras');
         const sectionCadastro = document.getElementById('section-cadastro');
         const sectionInventario = document.getElementById('section-inventario');
         const sectionUtilizacao = document.getElementById('section-utilizacao');
-        const sectionAproveitamento = document.getElementById('section-aproveitamento');
+        const sectionPlanoCorte = document.getElementById('section-plano-corte');
         const sectionCompras = document.getElementById('section-compras');
         const statusMessage = document.getElementById('status-message');
         const editModal = document.getElementById('edit-modal');
         const editQuantityInput = document.getElementById('edit-quantity');
         const loadingMessage = document.getElementById('loading-message');
-        const aproveitamentoValor = document.getElementById('aproveitamento-valor');
+        const lotesListEl = document.getElementById('lotes-list');
 
-        // New elements for Compras
+        // Elements for Compras
         const compraForm = document.getElementById('compra-form');
         const comprasListEl = document.getElementById('compras-list');
         const searchClienteInput = document.getElementById('search-cliente');
@@ -596,9 +581,9 @@
         let userId = null;
         let inventory = [];
         let utilizacaoList = [];
-        let currentEditingItem = null;
-        let chart = null;
+        let lotesList = [];
         let compras = [];
+        let currentEditingItem = null;
 
         signInAnonymously(auth).catch(console.error);
 
@@ -608,8 +593,8 @@
                 document.getElementById('user-id').textContent = userId;
                 listenInventory();
                 listenUtilizacao();
-                loadComprasFromStorage();
-                loadAproveitamentoFromStorage();
+                listenLotes();
+                listenCompras();
                 setTimeout(() => {
                     loadingMessage.style.display = 'none';
                 }, 1000);
@@ -617,24 +602,6 @@
                 document.getElementById('user-id').textContent = 'Não Autenticado';
             }
         });
-
-        // Local Storage for Aproveitamento
-        function loadAproveitamentoFromStorage() {
-            const storedAproveitamento = localStorage.getItem('aproveitamentoData');
-            if (storedAproveitamento) {
-                const data = JSON.parse(storedAproveitamento);
-                document.getElementById('total-utilizacoes').textContent = data.totalUtilizacoes || 0;
-                aproveitamentoValor.textContent = data.aproveitamento || '0%';
-            }
-        }
-
-        function saveAproveitamentoToStorage() {
-            const data = {
-                totalUtilizacoes: document.getElementById('total-utilizacoes').textContent,
-                aproveitamento: aproveitamentoValor.textContent
-            };
-            localStorage.setItem('aproveitamentoData', JSON.stringify(data));
-        }
 
         function getFormattedDateTime() {
             const now = new Date();
@@ -664,9 +631,24 @@
                     utilizacaoList.push({id: docSnap.id, ...data});
                 });
                 renderUtilizacao();
-                renderAproveitamento();
-                updateCharts();
-                saveAproveitamentoToStorage();
+            });
+        }
+
+        function listenLotes(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/lotes');
+            onSnapshot(colRef, (snapshot) => {
+                lotesList = [];
+                snapshot.forEach(docSnap => lotesList.push({id: docSnap.id, ...docSnap.data()}));
+                renderLotes();
+            });
+        }
+
+        function listenCompras(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/compras');
+            onSnapshot(colRef, (snapshot) => {
+                compras = [];
+                snapshot.forEach(docSnap => compras.push({id: docSnap.id, ...docSnap.data()}));
+                renderCompras();
             });
         }
 
@@ -679,6 +661,19 @@
                 return '<span class="status-badge status-medio">ESTOQUE MÉDIO</span>';
             } else {
                 return '<span class="status-badge status-alto">ESTOQUE ALTO</span>';
+            }
+        }
+
+        function getStatusLoteBadge(status) {
+            switch(status) {
+                case 'AGUARDANDO':
+                    return '<span class="status-badge status-aguardando">AGUARDANDO</span>';
+                case 'CORTANDO':
+                    return '<span class="status-badge status-cortando">CORTANDO</span>';
+                case 'FINALIZADO':
+                    return '<span class="status-badge status-finalizado">FINALIZADO</span>';
+                default:
+                    return '<span class="status-badge status-aguardando">AGUARDANDO</span>';
             }
         }
 
@@ -778,7 +773,6 @@
             renderInventory();
         });
 
-        // Corrigindo o botão de cadastrar - melhor tratamento de eventos
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -810,6 +804,37 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Cadastrar Material';
+            }
+        });
+
+        // Plano de Corte Form
+        planoCorteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const submitBtn = document.getElementById('salvar-lote-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Salvando...';
+            
+            try {
+                const data = {
+                    nomeLote: planoCorteForm['nome-lote'].value.toUpperCase(),
+                    clienteAmbiente: planoCorteForm['cliente-ambiente'].value,
+                    materiais: planoCorteForm['materiais-lote'].value,
+                    status: 'AGUARDANDO',
+                    dataCriacao: getFormattedDateTime()
+                };
+                
+                await addDoc(collection(db, 'artifacts/default-app-id/public/data/lotes'), data);
+                planoCorteForm.reset();
+                showStatus('Lote criado com sucesso!', 'bg-green-100 text-green-700');
+                switchTab('plano-corte');
+            } catch (error) {
+                console.error('Erro ao criar lote:', error);
+                showStatus('Erro ao criar lote. Tente novamente.', 'bg-red-100 text-red-700');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Salvar Lote';
             }
         });
 
@@ -869,309 +894,62 @@
             });
         }
 
-        function renderAproveitamento() {
-            const totalUtilizacoes = utilizacaoList.length;
-            document.getElementById('total-utilizacoes').textContent = totalUtilizacoes;
-
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            const utilizacoesHoje = utilizacaoList.filter(item => {
-                const itemDate = new Date(item.timestamp);
-                return itemDate.toLocaleDateString('pt-BR') === hoje;
-            }).length;
-            document.getElementById('utilizacoes-hoje').textContent = utilizacoesHoje;
-
-            if (totalUtilizacoes === 0) {
-                document.getElementById('material-mais-usado').textContent = '-';
-                aproveitamentoValor.textContent = '0%';
-                document.getElementById('ranking-materiais').innerHTML = 
-                    '<div class="text-gray-700 text-center py-6 md:py-8">Nenhum dado de utilização disponível.</div>';
-                document.getElementById('monthly-report').innerHTML = 
-                    '<div class="text-gray-700 text-center py-6 md:py-8 col-span-2">Dados mensais serão exibidos aqui.</div>';
+        function renderLotes(){
+            lotesListEl.innerHTML = '';
+            if(lotesList.length === 0){
+                lotesListEl.innerHTML = '<div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>';
                 return;
             }
-
-            const contadorMateriais = {};
-            utilizacaoList.forEach(item => {
-                const key = `${item.nome} ${item.espessura}mm`;
-                contadorMateriais[key] = (contadorMateriais[key] || 0) + item.quantidade;
-            });
-
-            const materialMaisUsado = Object.keys(contadorMateriais).reduce((a, b) => 
-                contadorMateriais[a] > contadorMateriais[b] ? a : b
-            );
-
-            document.getElementById('material-mais-usado').textContent = materialMaisUsado;
-
-            // Simple calculation for Aproveitamento based on counts, for demonstration
-            const totalItems = totalUtilizacoes + inventory.length;
-            const aproveitamento = totalItems > 0 ? (totalUtilizacoes / totalItems) * 100 : 0;
-            aproveitamentoValor.textContent = `${aproveitamento.toFixed(2)}%`;
-
-            const ranking = Object.entries(contadorMateriais)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 5);
-
-            const rankingHtml = ranking.map(([material, quantidade], index) => `
-                <div class="flex justify-between items-center p-3 md:p-4 bg-white rounded-lg shadow-sm">
-                    <div class="flex items-center">
-                        <span class="text-lg md:text-xl font-bold text-gray-950 mr-3 md:mr-4">${index + 1}º</span>
-                        <span class="text-sm md:text-base font-medium text-gray-950">${material}</span>
-                    </div>
-                    <span class="text-lg md:text-xl font-bold text-gray-950">${quantidade}</span>
-                </div>
-            `).join('');
-
-            document.getElementById('ranking-materiais').innerHTML = rankingHtml;
-
-            renderMonthlyReport();
-        }
-
-        function renderMonthlyReport() {
-            const now = new Date();
-            const thisMonth = now.getMonth();
-            const thisYear = now.getFullYear();
             
-            const utilizacoesThisMonth = utilizacaoList.filter(item => {
-                const itemDate = new Date(item.timestamp);
-                return itemDate.getMonth() === thisMonth && itemDate.getFullYear() === thisYear;
-            });
-
-            const lastMonth = new Date(thisYear, thisMonth - 1);
-            const utilizacoesLastMonth = utilizacaoList.filter(item => {
-                const itemDate = new Date(item.timestamp);
-                return itemDate.getMonth() === lastMonth.getMonth() && itemDate.getFullYear() === lastMonth.getFullYear();
-            });
-
-            const thisMonthCount = utilizacoesThisMonth.length;
-            const lastMonthCount = utilizacoesLastMonth.length;
-            const percentageChange = lastMonthCount > 0 ? ((thisMonthCount - lastMonthCount) / lastMonthCount * 100).toFixed(1) : 0;
-
-            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-                              'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-
-            document.getElementById('monthly-report').innerHTML = `
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <h4 class="font-semibold text-gray-950 mb-2">${monthNames[thisMonth]} ${thisYear}</h4>
-                    <div class="text-2xl font-bold text-gray-950">${thisMonthCount}</div>
-                    <div class="text-sm text-gray-600">utilizações este mês</div>
-                </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <h4 class="font-semibold text-gray-950 mb-2">Comparação com Mês Anterior</h4>
-                    <div class="text-2xl font-bold ${percentageChange >= 0 ? 'text-green-600' : 'text-red-600'}">
-                        ${percentageChange >= 0 ? '+' : ''}${percentageChange}%
-                    </div>
-                    <div class="text-sm text-gray-600">${lastMonthCount} no mês anterior</div>
-                </div>
-            `;
-        }
-
-        function updateCharts() {
-            const chartPeriod = document.getElementById('chart-period').value;
-            const chartType = document.getElementById('chart-type').value;
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            const ctx = document.getElementById('main-chart').getContext('2d');
-            
-            if (chartType === 'daily') {
-                createDailyChart(ctx, parseInt(chartPeriod));
-            } else if (chartType === 'materials') {
-                createMaterialChart(ctx);
-            } else if (chartType === 'thickness') {
-                createThicknessChart(ctx);
-            }
-        }
-
-        function createDailyChart(ctx, days) {
-            const labels = [];
-            const data = [];
-            
-            for (let i = days - 1; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toLocaleDateString('pt-BR');
-                labels.push(dateStr);
+            lotesList.forEach(lote => {
+                const loteDiv = document.createElement('div');
+                loteDiv.className = 'bg-gray-50 rounded-xl p-4 md:p-6 space-y-4';
                 
-                const count = utilizacaoList.filter(item => {
-                    const itemDate = new Date(item.timestamp);
-                    return itemDate.toLocaleDateString('pt-BR') === dateStr;
-                }).length;
-                data.push(count);
-            }
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Utilizações por Dia',
-                        data: data,
-                        borderColor: '#111827',
-                        backgroundColor: 'rgba(17, 24, 39, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
+                loteDiv.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-4">
+                        <div>
+                            <h4 class="text-lg md:text-xl font-bold text-gray-900">${lote.nomeLote}</h4>
+                            <p class="text-sm text-gray-600">Criado em: ${lote.dataCriacao}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${getStatusLoteBadge(lote.status)}
+                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteLote('${lote.id}')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-2">Cliente/Ambiente:</h5>
+                            <p class="text-sm text-gray-700 bg-white p-3 rounded">${lote.clienteAmbiente}</p>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-2">Materiais:</h5>
+                            <p class="text-sm text-gray-700 bg-white p-3 rounded">${lote.materiais}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 pt-4">
+                        ${lote.status === 'AGUARDANDO' ? `
+                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
+                                Cortando
+                            </button>
+                        ` : ''}
+                        ${lote.status === 'CORTANDO' ? `
+                            <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
+                                Finalizado
+                            </button>
+                        ` : ''}
+                        ${lote.status === 'FINALIZADO' ? `
+                            <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg text-center">
+                                Lote Finalizado
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                lotesListEl.appendChild(loteDiv);
             });
-        }
-
-        function createMaterialChart(ctx) {
-            const materialCount = {};
-            utilizacaoList.forEach(item => {
-                const key = `${item.nome} ${item.espessura}mm`;
-                materialCount[key] = (materialCount[key] || 0) + item.quantidade;
-            });
-            
-            const sorted = Object.entries(materialCount)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 10);
-            
-            const labels = sorted.map(([name]) => name);
-            const data = sorted.map(([,count]) => count);
-            
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Quantidade Utilizada',
-                        data: data,
-                        backgroundColor: '#111827',
-                        borderColor: '#1f2937',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        function createThicknessChart(ctx) {
-            const thicknessCount = {};
-            utilizacaoList.forEach(item => {
-                const key = `${item.espessura}mm`;
-                thicknessCount[key] = (thicknessCount[key] || 0) + item.quantidade;
-            });
-            
-            const labels = Object.keys(thicknessCount).sort((a, b) => parseInt(a) - parseInt(b));
-            const data = labels.map(label => thicknessCount[label]);
-            
-            chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Utilização por Espessura',
-                        data: data,
-                        backgroundColor: [
-                            '#111827', '#1f2937', '#374151', '#4b5563', 
-                            '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
-            });
-        }
-
-        document.getElementById('chart-period').addEventListener('change', updateCharts);
-        document.getElementById('chart-type').addEventListener('change', updateCharts);
-
-        function switchTab(tab){
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            sectionCadastro.classList.add('hidden');
-            sectionInventario.classList.add('hidden');
-            sectionUtilizacao.classList.add('hidden');
-            sectionAproveitamento.classList.add('hidden');
-            sectionCompras.classList.add('hidden');
-            
-            if(tab === 'cadastro') {
-                sectionCadastro.classList.remove('hidden');
-                tabCadastroBtn.classList.add('active');
-            } else if(tab === 'inventario') {
-                sectionInventario.classList.remove('hidden');
-                tabInventarioBtn.classList.add('active');
-            } else if(tab === 'utilizacao') {
-                sectionUtilizacao.classList.remove('hidden');
-                tabUtilizacaoBtn.classList.add('active');
-            } else if(tab === 'aproveitamento') {
-                sectionAproveitamento.classList.remove('hidden');
-                tabAproveitamentoBtn.classList.add('active');
-                setTimeout(updateCharts, 100);
-            } else if (tab === 'compras') {
-                sectionCompras.classList.remove('hidden');
-                tabComprasBtn.classList.add('active');
-                renderCompras();
-            }
-        }
-
-        tabCadastroBtn.addEventListener('click', () => switchTab('cadastro'));
-        tabInventarioBtn.addEventListener('click', () => switchTab('inventario'));
-        tabUtilizacaoBtn.addEventListener('click', () => switchTab('utilizacao'));
-        tabAproveitamentoBtn.addEventListener('click', () => switchTab('aproveitamento'));
-        tabComprasBtn.addEventListener('click', () => switchTab('compras'));
-
-        function showStatus(msg, cls){
-            statusMessage.textContent = msg;
-            statusMessage.className = `mb-4 md:mb-6 p-3 md:p-4 rounded-lg font-medium ${cls}`;
-            statusMessage.classList.remove('hidden');
-            setTimeout(() => statusMessage.classList.add('hidden'), 3000);
-        }
-
-        // --- Novas funções para o menu de Compras ---
-        function loadComprasFromStorage() {
-            const storedCompras = localStorage.getItem('compras');
-            if (storedCompras) {
-                compras = JSON.parse(storedCompras);
-            }
-        }
-
-        function saveComprasToStorage() {
-            localStorage.setItem('compras', JSON.stringify(compras));
         }
 
         function renderCompras(filterTerm = '') {
@@ -1183,7 +961,7 @@
                 return;
             }
 
-            filteredCompras.forEach((compra, index) => {
+            filteredCompras.forEach((compra) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bg-white rounded-xl shadow-sm p-4 md:p-8 space-y-4';
                 
@@ -1193,8 +971,8 @@
                         <div class="flex items-center space-x-2">
                             <input type="number" value="${material.quantidade}" 
                                 class="w-16 text-center text-sm md:text-base bg-gray-200 rounded-md p-1"
-                                onchange="updateItemQuantity(${index}, ${matIndex}, this.value)">
-                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra(${index}, ${matIndex})">
+                                onchange="updateItemQuantity('${compra.id}', ${matIndex}, this.value)">
+                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra('${compra.id}', ${matIndex})">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -1206,7 +984,7 @@
                 itemDiv.innerHTML = `
                     <div class="flex justify-between items-center border-b pb-2 mb-2">
                         <h4 class="text-lg md:text-xl font-bold text-gray-900">${compra.cliente.nome}</h4>
-                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra(${index})">
+                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra('${compra.id}')">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                              </svg>
@@ -1218,7 +996,7 @@
                         ${materiaisList}
                     </ul>
                     <div class="pt-4">
-                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal(${index})">
+                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
                             Adicionar Material
                         </button>
                     </div>
@@ -1227,22 +1005,25 @@
             });
         }
 
-        compraForm.addEventListener('submit', (e) => {
+        // Compras form
+        compraForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const novaCompra = {
-                id: Date.now().toString(),
-                cliente: {
-                    nome: document.getElementById('cliente-nome').value,
-                    ambientes: document.getElementById('cliente-ambientes').value,
-                },
-                materiais: [],
-                dataHora: getFormattedDateTime()
-            };
-            compras.unshift(novaCompra);
-            saveComprasToStorage();
-            renderCompras();
-            compraForm.reset();
-            showStatus('Compra cadastrada com sucesso!', 'bg-green-100 text-green-700');
+            try {
+                const novaCompra = {
+                    cliente: {
+                        nome: document.getElementById('cliente-nome').value,
+                        ambientes: document.getElementById('cliente-ambientes').value,
+                    },
+                    materiais: [],
+                    dataHora: getFormattedDateTime()
+                };
+                await addDoc(collection(db, 'artifacts/default-app-id/public/data/compras'), novaCompra);
+                compraForm.reset();
+                showStatus('Compra cadastrada com sucesso!', 'bg-green-100 text-green-700');
+            } catch (error) {
+                console.error('Erro ao cadastrar compra:', error);
+                showStatus('Erro ao cadastrar compra. Tente novamente.', 'bg-red-100 text-red-700');
+            }
         });
 
         filterClienteBtn.addEventListener('click', () => {
@@ -1255,41 +1036,87 @@
             renderCompras();
         });
 
-        window.updateItemQuantity = function(compraIndex, itemIndex, newQuantity) {
+        // Global functions for buttons
+        window.updateLoteStatus = async function(loteId, newStatus) {
+            try {
+                const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', loteId);
+                await updateDoc(docRef, { status: newStatus });
+                showStatus(`Status do lote atualizado para ${newStatus}!`, 'bg-green-100 text-green-700');
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+                showStatus('Erro ao atualizar status. Tente novamente.', 'bg-red-100 text-red-700');
+            }
+        };
+
+        window.deleteLote = async function(loteId) {
+            if (confirm('Tem certeza que deseja excluir este lote?')) {
+                try {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', loteId);
+                    await deleteDoc(docRef);
+                    showStatus('Lote excluído com sucesso!', 'bg-red-100 text-red-700');
+                } catch (error) {
+                    console.error('Erro ao excluir lote:', error);
+                    showStatus('Erro ao excluir lote. Tente novamente.', 'bg-red-100 text-red-700');
+                }
+            }
+        };
+
+        window.updateItemQuantity = async function(compraId, itemIndex, newQuantity) {
             const num = parseInt(newQuantity);
             if (!isNaN(num) && num >= 0) {
-                compras[compraIndex].materiais[itemIndex].quantidade = num;
-                saveComprasToStorage();
+                try {
+                    const compra = compras.find(c => c.id === compraId);
+                    if (compra) {
+                        compra.materiais[itemIndex].quantidade = num;
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                    }
+                } catch (error) {
+                    console.error('Erro ao atualizar quantidade:', error);
+                    renderCompras();
+                }
             } else {
-                renderCompras(); // Re-render to revert invalid input
+                renderCompras();
             }
         };
         
-        window.removeItemFromCompra = function(compraIndex, itemIndex) {
+        window.removeItemFromCompra = async function(compraId, itemIndex) {
             if (confirm('Tem certeza que deseja remover este material da compra?')) {
-                compras[compraIndex].materiais.splice(itemIndex, 1);
-                saveComprasToStorage();
-                renderCompras();
-                showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
+                try {
+                    const compra = compras.find(c => c.id === compraId);
+                    if (compra) {
+                        compra.materiais.splice(itemIndex, 1);
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                        showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
+                    }
+                } catch (error) {
+                    console.error('Erro ao remover material:', error);
+                    showStatus('Erro ao remover material. Tente novamente.', 'bg-red-100 text-red-700');
+                }
             }
         };
 
-        window.deleteCompra = function(compraIndex) {
+        window.deleteCompra = async function(compraId) {
             if (confirm('Tem certeza que deseja excluir esta compra e todos os seus itens?')) {
-                compras.splice(compraIndex, 1);
-                saveComprasToStorage();
-                renderCompras();
-                showStatus('Compra excluída com sucesso!', 'bg-red-100 text-red-700');
+                try {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                    await deleteDoc(docRef);
+                    showStatus('Compra excluída com sucesso!', 'bg-red-100 text-red-700');
+                } catch (error) {
+                    console.error('Erro ao excluir compra:', error);
+                    showStatus('Erro ao excluir compra. Tente novamente.', 'bg-red-100 text-red-700');
+                }
             }
         };
 
-        let currentCompraIndex = null;
+        let currentCompraId = null;
         const addItemModal = document.getElementById('add-item-modal');
         const addItemForm = document.getElementById('add-item-form');
         const cancelAddItemBtn = document.getElementById('cancel-add-item-btn');
 
-        window.openAddItemModal = function(index) {
-            currentCompraIndex = index;
+        window.openAddItemModal = function(compraId) {
+            currentCompraId = compraId;
             addItemModal.classList.remove('hidden');
         };
 
@@ -1298,7 +1125,7 @@
             addItemForm.reset();
         });
 
-        addItemForm.addEventListener('submit', (e) => {
+        addItemForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newItem = {
                 nome: document.getElementById('add-item-nome').value,
@@ -1306,18 +1133,69 @@
                 quantidade: parseInt(document.getElementById('add-item-quantidade').value)
             };
             
-            if (currentCompraIndex !== null) {
-                compras[currentCompraIndex].materiais.push(newItem);
-                saveComprasToStorage();
-                renderCompras();
-                addItemModal.classList.add('hidden');
-                addItemForm.reset();
-                showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
+            if (currentCompraId !== null) {
+                try {
+                    const compra = compras.find(c => c.id === currentCompraId);
+                    if (compra) {
+                        compra.materiais.push(newItem);
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', currentCompraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                        addItemModal.classList.add('hidden');
+                        addItemForm.reset();
+                        showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
+                    }
+                } catch (error) {
+                    console.error('Erro ao adicionar material:', error);
+                    showStatus('Erro ao adicionar material. Tente novamente.', 'bg-red-100 text-red-700');
+                }
             }
         });
+
+        function switchTab(tab){
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            sectionCadastro.classList.add('hidden');
+            sectionInventario.classList.add('hidden');
+            sectionUtilizacao.classList.add('hidden');
+            sectionPlanoCorte.classList.add('hidden');
+            sectionCompras.classList.add('hidden');
+            
+            if(tab === 'cadastro') {
+                sectionCadastro.classList.remove('hidden');
+                tabCadastroBtn.classList.add('active');
+            } else if(tab === 'inventario') {
+                sectionInventario.classList.remove('hidden');
+                tabInventarioBtn.classList.add('active');
+            } else if(tab === 'utilizacao') {
+                sectionUtilizacao.classList.remove('hidden');
+                tabUtilizacaoBtn.classList.add('active');
+            } else if(tab === 'plano-corte') {
+                sectionPlanoCorte.classList.remove('hidden');
+                tabPlanoCorteBtn.classList.add('active');
+                renderLotes();
+            } else if (tab === 'compras') {
+                sectionCompras.classList.remove('hidden');
+                tabComprasBtn.classList.add('active');
+                renderCompras();
+            }
+        }
+
+        tabCadastroBtn.addEventListener('click', () => switchTab('cadastro'));
+        tabInventarioBtn.addEventListener('click', () => switchTab('inventario'));
+        tabUtilizacaoBtn.addEventListener('click', () => switchTab('utilizacao'));
+        tabPlanoCorteBtn.addEventListener('click', () => switchTab('plano-corte'));
+        tabComprasBtn.addEventListener('click', () => switchTab('compras'));
+
+        function showStatus(msg, cls){
+            statusMessage.textContent = msg;
+            statusMessage.className = `mb-4 md:mb-6 p-3 md:p-4 rounded-lg font-medium ${cls}`;
+            statusMessage.classList.remove('hidden');
+            setTimeout(() => statusMessage.classList.add('hidden'), 3000);
+        }
 
         switchTab('inventario');
     </script>
 </body>
 </html>
-
