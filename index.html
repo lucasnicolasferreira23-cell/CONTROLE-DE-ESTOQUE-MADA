@@ -88,6 +88,26 @@
             color: #166534;
         }
         
+        /* Estilos para expansão/colapso */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .collapsible-content.expanded {
+            max-height: 1000px;
+            transition: max-height 0.3s ease-in;
+        }
+        
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
         @media print {
             body { background: white; margin: 0; padding: 0; }
             .no-print { display: none; }
@@ -306,6 +326,11 @@
                                 <textarea id="materiais-lote" name="materiais-lote" rows="3" placeholder="Ex: MDF2F 15mm - 5 chapas, MDF2F 18mm - 3 chapas" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
                             </div>
 
+                            <div>
+                                <label for="observacao-lote" class="block text-sm font-semibold text-gray-900 mb-2">OBSERVAÇÃO</label>
+                                <textarea id="observacao-lote" name="observacao-lote" rows="2" placeholder="Ex: Faltou uma chapa, sobrou material" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
+                            </div>
+
                             <div class="pt-4">
                                 <button type="submit" id="salvar-lote-btn" class="btn-primary w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-950 focus:ring-opacity-50">
                                     Salvar Lote
@@ -425,7 +450,7 @@
                             <p class="text-gray-700 mt-2">Gerencie os lotes de corte</p>
                         </div>
                         
-                        <div id="lotes-list" class="space-y-6">
+                        <div id="lotes-list" class="space-y-3">
                             <div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>
                         </div>
                     </div>
@@ -470,7 +495,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div id="compras-list" class="space-y-6">
+                            <div id="compras-list" class="space-y-3">
                                 <div class="text-gray-700 text-center py-6 md:py-8">Nenhuma compra cadastrada.</div>
                             </div>
                         </div>
@@ -823,6 +848,7 @@
                     nomeLote: planoCorteForm['nome-lote'].value.toUpperCase(),
                     clienteAmbiente: planoCorteForm['cliente-ambiente'].value,
                     materiais: planoCorteForm['materiais-lote'].value,
+                    observacao: planoCorteForm['observacao-lote'].value || '',
                     status: 'AGUARDANDO',
                     dataCriacao: getFormattedDateTime()
                 };
@@ -905,49 +931,69 @@
             
             lotesList.forEach(lote => {
                 const loteDiv = document.createElement('div');
-                loteDiv.className = 'bg-gray-50 rounded-xl p-4 md:p-6 space-y-4';
+                loteDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden';
                 
                 loteDiv.innerHTML = `
-                    <div class="flex justify-between items-center border-b pb-4">
-                        <div>
-                            <h4 class="text-lg md:text-xl font-bold text-gray-900">${lote.nomeLote}</h4>
-                            <p class="text-sm text-gray-600">Criado em: ${lote.dataCriacao}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            ${getStatusLoteBadge(lote.status)}
-                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteLote('${lote.id}')">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    <!-- Cabeçalho do lote (sempre visível) -->
+                    <div class="p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="toggleLoteDetails('${lote.id}')">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-gray-600 chevron-icon" id="chevron-${lote.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <h5 class="font-semibold text-gray-900 mb-2">Cliente/Ambiente:</h5>
-                            <p class="text-sm text-gray-700 bg-white p-3 rounded">${lote.clienteAmbiente}</p>
-                        </div>
-                        <div>
-                            <h5 class="font-semibold text-gray-900 mb-2">Materiais:</h5>
-                            <p class="text-sm text-gray-700 bg-white p-3 rounded">${lote.materiais}</p>
-                        </div>
-                    </div>
-                    <div class="flex space-x-2 pt-4">
-                        ${lote.status === 'AGUARDANDO' ? `
-                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
-                                Cortando
-                            </button>
-                        ` : ''}
-                        ${lote.status === 'CORTANDO' ? `
-                            <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
-                                Finalizado
-                            </button>
-                        ` : ''}
-                        ${lote.status === 'FINALIZADO' ? `
-                            <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg text-center">
-                                Lote Finalizado
+                                <h4 class="text-lg font-bold text-gray-900">${lote.nomeLote}</h4>
                             </div>
-                        ` : ''}
+                            <div class="flex items-center space-x-2">
+                                ${getStatusLoteBadge(lote.status)}
+                                <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="event.stopPropagation(); deleteLote('${lote.id}')">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">Criado em: ${lote.dataCriacao}</p>
+                    </div>
+                    
+                    <!-- Detalhes do lote (colapsado por padrão) -->
+                    <div class="collapsible-content" id="details-${lote.id}">
+                        <div class="px-4 pb-4 border-t border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <h5 class="font-semibold text-gray-900 mb-2">Cliente/Ambiente:</h5>
+                                    <p class="text-sm text-gray-700 bg-white p-3 rounded border">${lote.clienteAmbiente}</p>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-gray-900 mb-2">Materiais:</h5>
+                                    <p class="text-sm text-gray-700 bg-white p-3 rounded border">${lote.materiais}</p>
+                                </div>
+                            </div>
+                            
+                            ${lote.observacao ? `
+                                <div class="mt-4">
+                                    <h5 class="font-semibold text-gray-900 mb-2">Observação:</h5>
+                                    <p class="text-sm text-gray-700 bg-yellow-50 p-3 rounded border border-yellow-200">${lote.observacao}</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="flex space-x-2 pt-4">
+                                ${lote.status === 'AGUARDANDO' ? `
+                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
+                                        Cortando
+                                    </button>
+                                ` : ''}
+                                ${lote.status === 'CORTANDO' ? `
+                                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
+                                        Finalizado
+                                    </button>
+                                ` : ''}
+                                ${lote.status === 'FINALIZADO' ? `
+                                    <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg text-center">
+                                        Lote Finalizado
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
                 lotesListEl.appendChild(loteDiv);
@@ -965,16 +1011,16 @@
 
             filteredCompras.forEach((compra) => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'bg-white rounded-xl shadow-sm p-4 md:p-8 space-y-4';
+                itemDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden';
                 
                 const materiaisList = compra.materiais.map((material, matIndex) => `
-                    <li class="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg">
+                    <li class="flex items-center justify-between p-2 md:p-3 bg-white rounded-lg border">
                         <span class="text-sm md:text-base font-medium text-gray-800">${material.nome} - ${material.espessura}mm</span>
                         <div class="flex items-center space-x-2">
                             <input type="number" value="${material.quantidade}" 
-                                class="w-16 text-center text-sm md:text-base bg-gray-200 rounded-md p-1"
+                                class="w-16 text-center text-sm md:text-base bg-gray-100 rounded-md p-1 border"
                                 onchange="updateItemQuantity('${compra.id}', ${matIndex}, this.value)">
-                            <button class="text-red-500 hover:text-red-700 transition-colors" onclick="removeItemFromCompra('${compra.id}', ${matIndex})">
+                            <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="removeItemFromCompra('${compra.id}', ${matIndex})">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -984,28 +1030,63 @@
                 `).join('');
 
                 itemDiv.innerHTML = `
-                    <div class="flex justify-between items-center border-b pb-2 mb-2">
-                        <h4 class="text-lg md:text-xl font-bold text-gray-900">${compra.cliente.nome}</h4>
-                        <button class="text-red-500 hover:text-red-700 transition-colors" onclick="deleteCompra('${compra.id}')">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                             </svg>
-                         </button>
+                    <!-- Cabeçalho da compra (sempre visível) -->
+                    <div class="p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="toggleCompraDetails('${compra.id}')">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-gray-600 chevron-icon" id="chevron-compra-${compra.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                                <h4 class="text-lg font-bold text-gray-900">${compra.cliente.nome}</h4>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="event.stopPropagation(); deleteCompra('${compra.id}')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">Cadastrado em: ${compra.dataHora}</p>
                     </div>
-                    <p class="text-sm text-gray-700"><strong>Ambientes:</strong> ${compra.cliente.ambientes}</p>
-                    <p class="text-sm text-gray-500">Cadastrado em: ${compra.dataHora}</p>
-                    <ul class="space-y-2 mt-4">
-                        ${materiaisList}
-                    </ul>
-                    <div class="pt-4">
-                        <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
-                            Adicionar Material
-                        </button>
+                    
+                    <!-- Detalhes da compra (colapsado por padrão) -->
+                    <div class="collapsible-content" id="details-compra-${compra.id}">
+                        <div class="px-4 pb-4 border-t border-gray-200">
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-700 mb-4"><strong>Ambientes:</strong> ${compra.cliente.ambientes}</p>
+                                
+                                <h5 class="font-semibold text-gray-900 mb-3">Materiais:</h5>
+                                <ul class="space-y-2 mb-4">
+                                    ${materiaisList}
+                                </ul>
+                                
+                                <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
+                                    Adicionar Material
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
                 comprasListEl.appendChild(itemDiv);
             });
         }
+
+        // Funções para expandir/colapsar lotes
+        window.toggleLoteDetails = function(loteId) {
+            const details = document.getElementById(`details-${loteId}`);
+            const chevron = document.getElementById(`chevron-${loteId}`);
+            
+            details.classList.toggle('expanded');
+            chevron.classList.toggle('rotated');
+        };
+
+        // Funções para expandir/colapsar compras
+        window.toggleCompraDetails = function(compraId) {
+            const details = document.getElementById(`details-compra-${compraId}`);
+            const chevron = document.getElementById(`chevron-compra-${compraId}`);
+            
+            details.classList.toggle('expanded');
+            chevron.classList.toggle('rotated');
+        };
 
         // Compras form
         compraForm.addEventListener('submit', async (e) => {
