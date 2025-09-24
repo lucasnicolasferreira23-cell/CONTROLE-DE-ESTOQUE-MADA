@@ -116,10 +116,18 @@
             .mobile-hidden { display: table-cell !important; }
         }
         
+        /* ALTERAÇÃO: Removido mobile-hidden para mostrar comprimento e largura em dispositivos móveis */
         @media (max-width: 768px) {
             .sidebar { width: 100%; position: relative; }
             .main-content { margin-left: 0; }
-            .mobile-hidden { display: none; }
+            /* Agora as colunas de comprimento e largura são visíveis em mobile */
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            .table-responsive th,
+            .table-responsive td {
+                padding: 0.5rem 0.25rem;
+            }
         }
         
         .form-input {
@@ -144,6 +152,42 @@
             .btn-primary {
                 padding: 0.875rem 1.25rem;
             }
+        }
+
+        /* Estilos para plano de corte sofisticado */
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            border: 2px solid #f3f4f6;
+        }
+        
+        .timeline-dot.active {
+            background-color: #3b82f6;
+        }
+        
+        .timeline-dot.completed {
+            background-color: #10b981;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+
+        .observation-field {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
         }
     </style>
 </head>
@@ -213,7 +257,7 @@
                 </div>
             </nav>
             
-            <div class="absolute bottom-0 left-0 right-0 p-3 md:p-4 mobile-hidden">
+            <div class="absolute bottom-0 left-0 right-0 p-3 md:p-4 hidden md:block">
                 <div class="text-xs text-gray-500">
                     ID: <span id="user-id" class="text-gray-400">Carregando...</span>
                 </div>
@@ -303,7 +347,7 @@
                         </form>
                     </div>
 
-                    <!-- Nova seção para Plano de Corte -->
+                    <!-- ALTERAÇÃO: Removido campo de observação do formulário de criação de lote -->
                     <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
                         <div class="mb-6 md:mb-8">
                             <h2 class="text-xl md:text-2xl font-bold text-gray-950">Criar Plano de Corte</h2>
@@ -324,11 +368,6 @@
                             <div>
                                 <label for="materiais-lote" class="block text-sm font-semibold text-gray-900 mb-2">MATERIAIS</label>
                                 <textarea id="materiais-lote" name="materiais-lote" rows="3" placeholder="Ex: MDF2F 15mm - 5 chapas, MDF2F 18mm - 3 chapas" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
-                            </div>
-
-                            <div>
-                                <label for="observacao-lote" class="block text-sm font-semibold text-gray-900 mb-2">OBSERVAÇÃO</label>
-                                <textarea id="observacao-lote" name="observacao-lote" rows="2" placeholder="Ex: Faltou uma chapa, sobrou material" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
                             </div>
 
                             <div class="pt-4">
@@ -364,20 +403,21 @@
                             </div>
                         </div>
                         
+                        <!-- ALTERAÇÃO: Melhor responsividade da tabela para mostrar todas as colunas em mobile -->
                         <div class="overflow-x-auto rounded-lg shadow">
-                            <table class="min-w-full bg-white">
+                            <table class="min-w-full bg-white table-responsive">
                                 <thead class="bg-gray-100">
                                     <tr>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome do MDF</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Comprimento</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Largura</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Espessura</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Localização</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Tipo</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Quantidade</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Data Cadastro</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Status</th>
-                                        <th class="px-3 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Ações</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Comp.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Larg.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Esp.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Localização</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Qtd</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Data</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Status</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="inventory-table-body" class="bg-white"></tbody>
@@ -419,16 +459,16 @@
                             </div>
                             
                             <div class="overflow-x-auto rounded-lg shadow">
-                                <table class="min-w-full bg-white">
+                                <table class="min-w-full bg-white table-responsive">
                                     <thead class="bg-gray-100">
                                         <tr>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome do MDF</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Comprimento (mm)</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider mobile-hidden">Largura (mm)</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Espessura</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Localização</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Quantidade</th>
-                                            <th class="px-3 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Data Utilização</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Comp.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Larg.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Esp.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Local</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Qtd</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Data Utilização</th>
                                         </tr>
                                     </thead>
                                     <tbody id="utilizacao-table-body" class="bg-white">
@@ -442,15 +482,15 @@
                     </div>
                 </section>
 
-                <!-- Nova seção Plano de Corte -->
+                <!-- ALTERAÇÃO: Plano de corte melhorado e mais sofisticado -->
                 <section id="section-plano-corte" class="space-y-4 md:space-y-6 hidden">
                     <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
                         <div class="mb-4 md:mb-6">
                             <h2 class="text-xl md:text-2xl font-bold text-gray-950">Plano de Corte</h2>
-                            <p class="text-gray-700 mt-2">Gerencie os lotes de corte</p>
+                            <p class="text-gray-700 mt-2">Gerencie os lotes de corte com controle avançado</p>
                         </div>
                         
-                        <div id="lotes-list" class="space-y-3">
+                        <div id="lotes-list" class="space-y-4">
                             <div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>
                         </div>
                     </div>
@@ -549,11 +589,33 @@
                     <button type="submit" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
                         Adicionar Item
                     </button>
-                    <button type="button" id="cancel-add-item-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                    <button type="button" id="cancel-add-item-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-medium py-2 md:py-3 px-4 rounded-lg transition-colors">
                         Cancelar
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: Modal para editar observação do lote -->
+    <div id="observation-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
+            <div class="mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Editar Observação</h3>
+                <p class="text-gray-700 text-sm mt-1">Adicione ou edite observações sobre o lote</p>
+            </div>
+            <div class="mb-4 md:mb-6">
+                <label for="edit-observation" class="block text-sm font-semibold text-gray-900 mb-2">Observação:</label>
+                <textarea id="edit-observation" rows="4" placeholder="Ex: Faltou uma chapa, sobrou material, problema no corte..." class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white"></textarea>
+            </div>
+            <div class="space-y-3">
+                <button id="save-observation-btn" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                    Salvar Observação
+                </button>
+                <button id="cancel-observation-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+            </div>
         </div>
     </div>
 
@@ -605,12 +667,17 @@
         const filterClienteBtn = document.getElementById('filter-cliente-btn');
         const clearClienteFilterBtn = document.getElementById('clear-cliente-filter-btn');
 
+        // NOVO: Elements for observation modal
+        const observationModal = document.getElementById('observation-modal');
+        const editObservationInput = document.getElementById('edit-observation');
+
         let userId = null;
         let inventory = [];
         let utilizacaoList = [];
         let lotesList = [];
         let compras = [];
         let currentEditingItem = null;
+        let currentEditingLote = null; // NOVO: para observação
 
         signInAnonymously(auth).catch(console.error);
 
@@ -704,6 +771,16 @@
             }
         }
 
+        // NOVO: Função para calcular progresso do lote
+        function getProgressPercentage(status) {
+            switch(status) {
+                case 'AGUARDANDO': return 10;
+                case 'CORTANDO': return 60;
+                case 'FINALIZADO': return 100;
+                default: return 10;
+            }
+        }
+
         inventoryTableBody.addEventListener('click', async (e) => {
             if (e.target.classList.contains('delete-btn')) {
                 const id = e.target.dataset.id;
@@ -764,6 +841,23 @@
         document.getElementById('cancel-edit-btn').addEventListener('click', () => {
             editModal.classList.add('hidden');
             currentEditingItem = null;
+        });
+
+        // NOVO: Event listeners para modal de observação
+        document.getElementById('save-observation-btn').addEventListener('click', async () => {
+            if (currentEditingLote) {
+                const newObservation = editObservationInput.value.trim();
+                const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', currentEditingLote.id);
+                await updateDoc(docRef, { observacao: newObservation });
+                showStatus('Observação atualizada com sucesso!', 'bg-green-100 text-green-700');
+                observationModal.classList.add('hidden');
+                currentEditingLote = null;
+            }
+        });
+
+        document.getElementById('cancel-observation-btn').addEventListener('click', () => {
+            observationModal.classList.add('hidden');
+            currentEditingLote = null;
         });
 
         document.getElementById('print-btn').addEventListener('click', () => {
@@ -834,7 +928,7 @@
             }
         });
 
-        // Plano de Corte Form
+        // ALTERAÇÃO: Plano de Corte Form - removido campo observação
         planoCorteForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -848,7 +942,7 @@
                     nomeLote: planoCorteForm['nome-lote'].value.toUpperCase(),
                     clienteAmbiente: planoCorteForm['cliente-ambiente'].value,
                     materiais: planoCorteForm['materiais-lote'].value,
-                    observacao: planoCorteForm['observacao-lote'].value || '',
+                    observacao: '', // ALTERAÇÃO: Campo observação agora inicia vazio
                     status: 'AGUARDANDO',
                     dataCriacao: getFormattedDateTime()
                 };
@@ -881,21 +975,21 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors';
                 tr.innerHTML = `
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 mobile-hidden">${item.comprimento}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 mobile-hidden">${item.largura}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 mobile-hidden">${item.localizacao || 'Não informada'}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.comprimento}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.largura}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 hidden md:table-cell">${item.localizacao || 'Não informada'}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap">
                     <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${item.tipo === 'Chapa' ? 'bg-gray-800 text-white' : 'bg-gray-300 text-gray-950'}">${item.tipo}</span>
                 </td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.dataCadastro}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm">${getStatusBadge(item.quantidade, item.tipo)}</td>
-                <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-right text-sm space-x-1">
-                    <button class="inline-flex items-center px-2 md:px-3 py-1 md:py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors edit-btn" data-id="${item.id}">Editar</button>
-                    ${item.tipo === 'Sobra' ? `<button class="inline-flex items-center px-2 md:px-3 py-1 md:py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors mr-1 utilize-btn" data-id="${item.id}">Utilizar</button>` : ''}
-                    <button class="inline-flex items-center px-2 md:px-3 py-1 md:py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors delete-btn" data-id="${item.id}">Excluir</button>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 hidden md:table-cell">${item.dataCadastro}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm hidden md:table-cell">${getStatusBadge(item.quantidade, item.tipo)}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-right text-sm space-x-1">
+                    <button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors edit-btn" data-id="${item.id}">Edit</button>
+                    ${item.tipo === 'Sobra' ? `<button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors mr-1 utilize-btn" data-id="${item.id}">Usar</button>` : ''}
+                    <button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors delete-btn" data-id="${item.id}">Del</button>
                 </td>`;
                 inventoryTableBody.appendChild(tr);
             });
@@ -911,17 +1005,18 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-colors';
                 tr.innerHTML = `
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 mobile-hidden">${item.comprimento}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 mobile-hidden">${item.largura}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 font-medium">${item.localizacao || 'Não informada'}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
-                <td class="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.dataUtilizacao}</td>`;
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.comprimento}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.largura}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 font-medium">${item.localizacao || 'Não informada'}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.dataUtilizacao}</td>`;
                 utilizacaoTableBody.appendChild(tr);
             });
         }
 
+        // ALTERAÇÃO: Função renderLotes melhorada com design sofisticado e observação editável
         function renderLotes(){
             lotesListEl.innerHTML = '';
             if(lotesList.length === 0){
@@ -930,8 +1025,9 @@
             }
             
             lotesList.forEach(lote => {
+                const progress = getProgressPercentage(lote.status);
                 const loteDiv = document.createElement('div');
-                loteDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden';
+                loteDiv.className = 'bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow';
                 
                 loteDiv.innerHTML = `
                     <!-- Cabeçalho do lote (sempre visível) -->
@@ -941,9 +1037,12 @@
                                 <svg class="w-5 h-5 text-gray-600 chevron-icon" id="chevron-${lote.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
-                                <h4 class="text-lg font-bold text-gray-900">${lote.nomeLote}</h4>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-900">${lote.nomeLote}</h4>
+                                    <p class="text-sm text-gray-600">Criado em: ${lote.dataCriacao}</p>
+                                </div>
                             </div>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-3">
                                 ${getStatusLoteBadge(lote.status)}
                                 <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="event.stopPropagation(); deleteLote('${lote.id}')">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -952,44 +1051,102 @@
                                 </button>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mt-1">Criado em: ${lote.dataCriacao}</p>
+                        
+                        <!-- Barra de progresso -->
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progresso do Lote</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline visual -->
+                        <div class="flex items-center justify-between mt-4 px-2">
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'AGUARDANDO' || lote.status === 'CORTANDO' || lote.status === 'FINALIZADO' ? 'completed' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Aguardando</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'CORTANDO' || lote.status === 'FINALIZADO' ? 'completed' : lote.status === 'CORTANDO' ? 'active' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Cortando</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'FINALIZADO' ? 'completed' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Finalizado</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Detalhes do lote (colapsado por padrão) -->
                     <div class="collapsible-content" id="details-${lote.id}">
-                        <div class="px-4 pb-4 border-t border-gray-200">
+                        <div class="px-4 pb-4 border-t border-gray-200 bg-white">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 <div>
-                                    <h5 class="font-semibold text-gray-900 mb-2">Cliente/Ambiente:</h5>
-                                    <p class="text-sm text-gray-700 bg-white p-3 rounded border">${lote.clienteAmbiente}</p>
+                                    <h5 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        Cliente/Ambiente:
+                                    </h5>
+                                    <p class="text-sm text-gray-700 bg-blue-50 p-3 rounded border border-blue-200">${lote.clienteAmbiente}</p>
                                 </div>
                                 <div>
-                                    <h5 class="font-semibold text-gray-900 mb-2">Materiais:</h5>
-                                    <p class="text-sm text-gray-700 bg-white p-3 rounded border">${lote.materiais}</p>
+                                    <h5 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                        </svg>
+                                        Materiais:
+                                    </h5>
+                                    <p class="text-sm text-gray-700 bg-green-50 p-3 rounded border border-green-200">${lote.materiais}</p>
                                 </div>
                             </div>
                             
-                            ${lote.observacao ? `
-                                <div class="mt-4">
-                                    <h5 class="font-semibold text-gray-900 mb-2">Observação:</h5>
-                                    <p class="text-sm text-gray-700 bg-yellow-50 p-3 rounded border border-yellow-200">${lote.observacao}</p>
+                            <!-- NOVO: Campo de observação editável -->
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="font-semibold text-gray-900 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Observação:
+                                    </h5>
+                                    <button class="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium rounded-lg transition-colors" onclick="openObservationModal('${lote.id}')">
+                                        ${lote.observacao ? 'Editar' : 'Adicionar'}
+                                    </button>
                                 </div>
-                            ` : ''}
+                                <div class="observation-field p-3 rounded border-2 border-dashed min-h-[60px] flex items-center">
+                                    ${lote.observacao ? `<p class="text-sm text-gray-800">${lote.observacao}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação adicionada. Clique em "Adicionar" para registrar problemas ou notas importantes.</p>'}
+                                </div>
+                            </div>
                             
                             <div class="flex space-x-2 pt-4">
                                 ${lote.status === 'AGUARDANDO' ? `
-                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
-                                        Cortando
+                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6-4h10a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
+                                        </svg>
+                                        Iniciar Corte
                                     </button>
                                 ` : ''}
                                 ${lote.status === 'CORTANDO' ? `
-                                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
-                                        Finalizado
+                                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Finalizar Lote
                                     </button>
                                 ` : ''}
                                 ${lote.status === 'FINALIZADO' ? `
-                                    <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg text-center">
-                                        Lote Finalizado
+                                    <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg text-center flex items-center justify-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Lote Concluído
                                     </div>
                                 ` : ''}
                             </div>
@@ -1069,6 +1226,15 @@
                 comprasListEl.appendChild(itemDiv);
             });
         }
+
+        // NOVO: Função para abrir modal de observação
+        window.openObservationModal = function(loteId) {
+            currentEditingLote = lotesList.find(lote => lote.id === loteId);
+            if (currentEditingLote) {
+                editObservationInput.value = currentEditingLote.observacao || '';
+                observationModal.classList.remove('hidden');
+            }
+        };
 
         // Funções para expandir/colapsar lotes
         window.toggleLoteDetails = function(loteId) {
