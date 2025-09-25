@@ -189,6 +189,36 @@
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border: 2px solid #f59e0b;
         }
+
+        /* NOVO: Estilos para campos de máquinas */
+        .machine-field {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border: 2px solid #3b82f6;
+        }
+
+        .machine-field.nanxing {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 2px solid #10b981;
+        }
+
+        /* CORREÇÃO: Estilos para melhor visibilidade do modal e botões em compras grandes */
+        .compra-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .add-material-btn {
+            position: sticky;
+            bottom: 10px;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .materiais-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -347,7 +377,7 @@
                         </form>
                     </div>
 
-                    <!-- ALTERAÇÃO: Removido campo de observação do formulário de criação de lote -->
+                    <!-- ALTERAÇÃO 1: Removido campo de materiais do formulário de criação de lote -->
                     <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
                         <div class="mb-6 md:mb-8">
                             <h2 class="text-xl md:text-2xl font-bold text-gray-950">Criar Plano de Corte</h2>
@@ -363,11 +393,6 @@
                             <div>
                                 <label for="cliente-ambiente" class="block text-sm font-semibold text-gray-900 mb-2">CLIENTE/AMBIENTE</label>
                                 <textarea id="cliente-ambiente" name="cliente-ambiente" rows="3" placeholder="Ex: João Silva - Cozinha, Sala" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
-                            </div>
-
-                            <div>
-                                <label for="materiais-lote" class="block text-sm font-semibold text-gray-900 mb-2">MATERIAIS</label>
-                                <textarea id="materiais-lote" name="materiais-lote" rows="3" placeholder="Ex: MDF2F 15mm - 5 chapas, MDF2F 18mm - 3 chapas" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
                             </div>
 
                             <div class="pt-4">
@@ -482,7 +507,7 @@
                     </div>
                 </section>
 
-                <!-- ALTERAÇÃO: Plano de corte melhorado e mais sofisticado -->
+                <!-- ALTERAÇÃO 2: Plano de corte com campos separados para SECCIONADORA e NANXING -->
                 <section id="section-plano-corte" class="space-y-4 md:space-y-6 hidden">
                     <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
                         <div class="mb-4 md:mb-6">
@@ -566,7 +591,8 @@
         </div>
     </div>
 
-    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <!-- CORREÇÃO 3: Modal melhorado para adicionar item com melhor z-index -->
+    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
         <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
             <div class="mb-4 md:mb-6">
                 <h3 class="text-lg md:text-xl font-bold text-gray-950">Adicionar Material</h3>
@@ -597,22 +623,39 @@
         </div>
     </div>
 
-    <!-- NOVO MODAL: Modal para editar observação do lote -->
-    <div id="observation-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
+    <!-- NOVO: Modal para editar observações das máquinas SECCIONADORA e NANXING -->
+    <div id="machines-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-[500px] shadow-xl rounded-xl bg-white">
             <div class="mb-4 md:mb-6">
-                <h3 class="text-lg md:text-xl font-bold text-gray-950">Editar Observação</h3>
-                <p class="text-gray-700 text-sm mt-1">Adicione ou edite observações sobre o lote</p>
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Observações das Máquinas</h3>
+                <p class="text-gray-700 text-sm mt-1">Adicione observações específicas para cada máquina</p>
             </div>
-            <div class="mb-4 md:mb-6">
-                <label for="edit-observation" class="block text-sm font-semibold text-gray-900 mb-2">Observação:</label>
-                <textarea id="edit-observation" rows="4" placeholder="Ex: Faltou uma chapa, sobrou material, problema no corte..." class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white"></textarea>
+            <div class="space-y-4">
+                <div>
+                    <label for="edit-seccionadora" class="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                        SECCIONADORA:
+                    </label>
+                    <textarea id="edit-seccionadora" rows="3" placeholder="Ex: Corte realizado sem problemas, material de boa qualidade..." class="form-input w-full bg-blue-50 rounded-lg transition-colors focus:bg-white machine-field"></textarea>
+                </div>
+                <div>
+                    <label for="edit-nanxing" class="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        NANXING:
+                    </label>
+                    <textarea id="edit-nanxing" rows="3" placeholder="Ex: Ajustes realizados na máquina, tempo de corte otimizado..." class="form-input w-full bg-green-50 rounded-lg transition-colors focus:bg-white machine-field nanxing"></textarea>
+                </div>
             </div>
-            <div class="space-y-3">
-                <button id="save-observation-btn" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
-                    Salvar Observação
+            <div class="space-y-3 mt-6">
+                <button id="save-machines-btn" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                    Salvar Observações
                 </button>
-                <button id="cancel-observation-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                <button id="cancel-machines-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
                     Cancelar
                 </button>
             </div>
@@ -667,9 +710,10 @@
         const filterClienteBtn = document.getElementById('filter-cliente-btn');
         const clearClienteFilterBtn = document.getElementById('clear-cliente-filter-btn');
 
-        // NOVO: Elements for observation modal
-        const observationModal = document.getElementById('observation-modal');
-        const editObservationInput = document.getElementById('edit-observation');
+        // NOVO: Elements for machines modal
+        const machinesModal = document.getElementById('machines-modal');
+        const editSeccionadoraInput = document.getElementById('edit-seccionadora');
+        const editNanxingInput = document.getElementById('edit-nanxing');
 
         let userId = null;
         let inventory = [];
@@ -677,7 +721,7 @@
         let lotesList = [];
         let compras = [];
         let currentEditingItem = null;
-        let currentEditingLote = null; // NOVO: para observação
+        let currentEditingLote = null; // NOVO: para observações das máquinas
 
         signInAnonymously(auth).catch(console.error);
 
@@ -843,20 +887,24 @@
             currentEditingItem = null;
         });
 
-        // NOVO: Event listeners para modal de observação
-        document.getElementById('save-observation-btn').addEventListener('click', async () => {
+        // NOVO: Event listeners para modal das máquinas
+        document.getElementById('save-machines-btn').addEventListener('click', async () => {
             if (currentEditingLote) {
-                const newObservation = editObservationInput.value.trim();
+                const seccionadoraObs = editSeccionadoraInput.value.trim();
+                const nanxingObs = editNanxingInput.value.trim();
                 const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', currentEditingLote.id);
-                await updateDoc(docRef, { observacao: newObservation });
-                showStatus('Observação atualizada com sucesso!', 'bg-green-100 text-green-700');
-                observationModal.classList.add('hidden');
+                await updateDoc(docRef, { 
+                    observacaoSeccionadora: seccionadoraObs,
+                    observacaoNanxing: nanxingObs
+                });
+                showStatus('Observações das máquinas atualizadas com sucesso!', 'bg-green-100 text-green-700');
+                machinesModal.classList.add('hidden');
                 currentEditingLote = null;
             }
         });
 
-        document.getElementById('cancel-observation-btn').addEventListener('click', () => {
-            observationModal.classList.add('hidden');
+        document.getElementById('cancel-machines-btn').addEventListener('click', () => {
+            machinesModal.classList.add('hidden');
             currentEditingLote = null;
         });
 
@@ -928,7 +976,7 @@
             }
         });
 
-        // ALTERAÇÃO: Plano de Corte Form - removido campo observação
+        // ALTERAÇÃO 1: Plano de Corte Form - removido campo materiais e observação
         planoCorteForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -941,8 +989,8 @@
                 const data = {
                     nomeLote: planoCorteForm['nome-lote'].value.toUpperCase(),
                     clienteAmbiente: planoCorteForm['cliente-ambiente'].value,
-                    materiais: planoCorteForm['materiais-lote'].value,
-                    observacao: '', // ALTERAÇÃO: Campo observação agora inicia vazio
+                    observacaoSeccionadora: '', // NOVO: Campo observação SECCIONADORA inicia vazio
+                    observacaoNanxing: '', // NOVO: Campo observação NANXING inicia vazio
                     status: 'AGUARDANDO',
                     dataCriacao: getFormattedDateTime()
                 };
@@ -1016,7 +1064,7 @@
             });
         }
 
-        // ALTERAÇÃO: Função renderLotes melhorada com design sofisticado e observação editável
+        // ALTERAÇÃO 2: Função renderLotes com campos separados para SECCIONADORA e NANXING
         function renderLotes(){
             lotesListEl.innerHTML = '';
             if(lotesList.length === 0){
@@ -1085,7 +1133,7 @@
                     <!-- Detalhes do lote (colapsado por padrão) -->
                     <div class="collapsible-content" id="details-${lote.id}">
                         <div class="px-4 pb-4 border-t border-gray-200 bg-white">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="mt-4">
                                 <div>
                                     <h5 class="font-semibold text-gray-900 mb-2 flex items-center">
                                         <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1093,34 +1141,49 @@
                                         </svg>
                                         Cliente/Ambiente:
                                     </h5>
-                                    <p class="text-sm text-gray-700 bg-blue-50 p-3 rounded border border-blue-200">${lote.clienteAmbiente}</p>
-                                </div>
-                                <div>
-                                    <h5 class="font-semibold text-gray-900 mb-2 flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                        </svg>
-                                        Materiais:
-                                    </h5>
-                                    <p class="text-sm text-gray-700 bg-green-50 p-3 rounded border border-green-200">${lote.materiais}</p>
+                                    <p class="text-sm text-gray-700 bg-blue-50 p-3 rounded border border-blue-200 mb-4">${lote.clienteAmbiente}</p>
                                 </div>
                             </div>
                             
-                            <!-- NOVO: Campo de observação editável -->
+                            <!-- NOVO: Campos separados para observações das máquinas -->
                             <div class="mt-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <h5 class="font-semibold text-gray-900 flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                                         </svg>
-                                        Observação:
+                                        Observações das Máquinas:
                                     </h5>
-                                    <button class="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium rounded-lg transition-colors" onclick="openObservationModal('${lote.id}')">
-                                        ${lote.observacao ? 'Editar' : 'Adicionar'}
+                                    <button class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition-colors" onclick="openMachinesModal('${lote.id}')">
+                                        ${(lote.observacaoSeccionadora || lote.observacaoNanxing) ? 'Editar' : 'Adicionar'}
                                     </button>
                                 </div>
-                                <div class="observation-field p-3 rounded border-2 border-dashed min-h-[60px] flex items-center">
-                                    ${lote.observacao ? `<p class="text-sm text-gray-800">${lote.observacao}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação adicionada. Clique em "Adicionar" para registrar problemas ou notas importantes.</p>'}
+                                
+                                <!-- Campo SECCIONADORA -->
+                                <div class="mb-3">
+                                    <div class="flex items-center mb-1">
+                                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">SECCIONADORA:</span>
+                                    </div>
+                                    <div class="machine-field p-3 rounded border-2 border-dashed min-h-[50px] flex items-center">
+                                        ${lote.observacaoSeccionadora ? `<p class="text-sm text-gray-800">${lote.observacaoSeccionadora}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação da seccionadora.</p>'}
+                                    </div>
+                                </div>
+                                
+                                <!-- Campo NANXING -->
+                                <div class="mb-4">
+                                    <div class="flex items-center mb-1">
+                                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">NANXING:</span>
+                                    </div>
+                                    <div class="machine-field nanxing p-3 rounded border-2 border-dashed min-h-[50px] flex items-center">
+                                        ${lote.observacaoNanxing ? `<p class="text-sm text-gray-800">${lote.observacaoNanxing}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação da Nanxing.</p>'}
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1157,6 +1220,7 @@
             });
         }
 
+        // CORREÇÃO 3: Função renderCompras melhorada para evitar problemas com botão de adicionar material
         function renderCompras(filterTerm = '') {
             comprasListEl.innerHTML = '';
             const filteredCompras = compras.filter(c => c.cliente.nome.toLowerCase().includes(filterTerm.toLowerCase()));
@@ -1168,7 +1232,7 @@
 
             filteredCompras.forEach((compra) => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden';
+                itemDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden compra-container';
                 
                 const materiaisList = compra.materiais.map((material, matIndex) => `
                     <li class="flex items-center justify-between p-2 md:p-3 bg-white rounded-lg border">
@@ -1212,11 +1276,17 @@
                                 <p class="text-sm text-gray-700 mb-4"><strong>Ambientes:</strong> ${compra.cliente.ambientes}</p>
                                 
                                 <h5 class="font-semibold text-gray-900 mb-3">Materiais:</h5>
-                                <ul class="space-y-2 mb-4">
-                                    ${materiaisList}
-                                </ul>
+                                <div class="materiais-list">
+                                    <ul class="space-y-2 mb-4">
+                                        ${materiaisList}
+                                    </ul>
+                                </div>
                                 
-                                <button class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
+                                <!-- CORREÇÃO: Botão de adicionar material com posição fixa e z-index alto -->
+                                <button class="add-material-btn w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
+                                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
                                     Adicionar Material
                                 </button>
                             </div>
@@ -1227,12 +1297,13 @@
             });
         }
 
-        // NOVO: Função para abrir modal de observação
-        window.openObservationModal = function(loteId) {
+        // NOVO: Função para abrir modal das máquinas
+        window.openMachinesModal = function(loteId) {
             currentEditingLote = lotesList.find(lote => lote.id === loteId);
             if (currentEditingLote) {
-                editObservationInput.value = currentEditingLote.observacao || '';
-                observationModal.classList.remove('hidden');
+                editSeccionadoraInput.value = currentEditingLote.observacaoSeccionadora || '';
+                editNanxingInput.value = currentEditingLote.observacaoNanxing || '';
+                machinesModal.classList.remove('hidden');
             }
         };
 
