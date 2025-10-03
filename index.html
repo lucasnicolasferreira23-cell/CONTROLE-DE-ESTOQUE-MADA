@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão MADA - Controle Avançado</title>
+    <title>CONTROLE DE ESTOQUE MADA</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#ff6b35',
-                        'secondary': '#f7931e',
-                        'dark-navy': '#0f172a',
-                        'dark-slate': '#1e293b',
-                        'success': '#10b981',
-                        'warning': '#f59e0b',
-                        'danger': '#ef4444',
+                        'gray-950': '#030712',
+                        'gray-900': '#111827',
+                        'gray-800': '#1f2937',
+                        'gray-700': '#374151',
+                        'gray-600': '#4b5563',
+                        'gray-500': '#6b7280',
+                        'gray-400': '#9ca3af',
+                        'gray-300': '#d1d5db',
+                        'gray-200': '#e5e7eb',
+                        'gray-100': '#f3f4f6',
+                        'gray-50': '#f9fafb'
                     }
                 }
             }
@@ -28,527 +33,536 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0f172a;
-            min-height: 100vh;
+            background-color: #f3f4f6; 
         }
         
-        .glass-effect {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 107, 53, 0.1);
-        }
-        
-        .sidebar-item {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            color: #cbd5e1;
-        }
-        
-        .sidebar-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: linear-gradient(180deg, #ff6b35, #f7931e);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .sidebar-item:hover::before,
-        .sidebar-item.active::before {
-            transform: scaleY(1);
-        }
-        
-        .sidebar-item:hover {
-            background: rgba(255, 107, 53, 0.1);
-            transform: translateX(5px);
-            color: #ff6b35;
-        }
-        
-        .sidebar-item.active {
-            background: linear-gradient(90deg, rgba(255, 107, 53, 0.15), transparent);
-            font-weight: 600;
-            color: #ff6b35;
-        }
-        
-        .status-badge {
-            padding: 0.375rem 0.875rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .status-solicitado {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            color: #92400e;
-        }
-        
-        .status-iniciado {
-            background: linear-gradient(135deg, #dbeafe, #93c5fd);
-            color: #1e40af;
-        }
-        
-        .status-concluido {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
-        }
-        
-        .status-pendente {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            color: #991b1b;
-        }
-        
-        .status-em-andamento {
-            background: linear-gradient(135deg, #dbeafe, #93c5fd);
-            color: #1e40af;
-        }
-        
-        .status-finalizado {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
-        }
-        
-        .status-aguardando {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            color: #92400e;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            color: white;
-            font-weight: 600;
-        }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.5);
-        }
-        
-        .card {
-            background: #1e293b;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 107, 53, 0.1);
-        }
-        
-        .card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            transform: translateY(-2px);
-        }
-        
-        .progress-bar {
-            height: 8px;
-            background: #334155;
-            border-radius: 9999px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b35, #f7931e);
-            border-radius: 9999px;
-            transition: width 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .observation-box {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
-            border-left: 4px solid #f59e0b;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .machine-label {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .machine-seccionadora {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-        }
-        
-        .machine-nanxing {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
+        * {
+            box-sizing: border-box;
         }
         
         input, textarea, select {
-            background: #334155;
-            color: #e2e8f0;
-            border: 1px solid #475569;
+            background-color: #f3f4f6;
         }
         
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #ff6b35;
-            ring: 2px;
-            ring-color: rgba(255, 107, 53, 0.3);
+            background-color: #ffffff;
         }
         
-        input::placeholder, textarea::placeholder {
-            color: #64748b;
+        .sidebar-item:hover { 
+            background-color: #374151; 
+        }
+        .sidebar-item.active { 
+            background-color: #1f2937; 
+            color: white; 
+        }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .status-baixo {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        .status-medio {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+        .status-alto {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        .status-aguardando {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-cortando {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .status-finalizado {
+            background-color: #dcfce7;
+            color: #166534;
         }
         
-        .delete-btn {
-            transition: all 0.3s ease;
-            background: #dc2626;
-        }
-        
-        .delete-btn:hover {
-            background: #b91c1c !important;
-            transform: scale(1.05);
-        }
-        
-        .phase-card {
-            border: 2px solid #334155;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
-            background: rgba(30, 41, 59, 0.5);
-        }
-        
-        .phase-card.active {
-            border-color: #3b82f6;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
-        }
-        
-        .phase-card.completed {
-            border-color: #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
-        }
-        
-        .collapsible-plan {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .collapsible-plan:hover {
-            background: rgba(255, 107, 53, 0.05);
-        }
-        
-        .plan-content {
+        /* Estilos para expansão/colapso */
+        .collapsible-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: max-height 0.3s ease-out;
         }
         
-        .plan-content.expanded {
-            max-height: 5000px;
+        .collapsible-content.expanded {
+            max-height: 1000px;
+            transition: max-height 0.3s ease-in;
         }
         
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.05));
-            border: 1px solid rgba(255, 107, 53, 0.2);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
+        .chevron-icon {
+            transition: transform 0.3s ease;
         }
         
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
         }
         
-        .text-light {
-            color: #e2e8f0;
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none; }
+            .print-only { display: block; }
+            /* IMPORTANTE: Força a exibição das colunas de comprimento e largura na impressão */
+            .mobile-hidden { display: table-cell !important; }
         }
         
-        .text-muted {
-            color: #94a3b8;
+        /* ALTERAÇÃO: Removido mobile-hidden para mostrar comprimento e largura em dispositivos móveis */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; position: relative; }
+            .main-content { margin-left: 0; }
+            /* Agora as colunas de comprimento e largura são visíveis em mobile */
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            .table-responsive th,
+            .table-responsive td {
+                padding: 0.5rem 0.25rem;
+            }
         }
         
-        label {
-            color: #cbd5e1;
+        .form-input {
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s ease;
         }
         
-        h1, h2, h3, h4 {
-            color: #f1f5f9;
+        @media (min-width: 768px) {
+            .form-input {
+                padding: 0.625rem 0.875rem;
+            }
+        }
+
+        .btn-primary {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
         }
         
-        table {
-            color: #e2e8f0;
+        @media (min-width: 768px) {
+            .btn-primary {
+                padding: 0.875rem 1.25rem;
+            }
+        }
+
+        /* Estilos para plano de corte sofisticado */
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            border: 2px solid #f3f4f6;
         }
         
-        thead {
-            background: rgba(255, 107, 53, 0.1) !important;
+        .timeline-dot.active {
+            background-color: #3b82f6;
         }
         
-        tbody tr:hover {
-            background: rgba(255, 107, 53, 0.05) !important;
+        .timeline-dot.completed {
+            background-color: #10b981;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+
+        .observation-field {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+        }
+
+        /* NOVO: Estilos para campos de máquinas */
+        .machine-field {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border: 2px solid #3b82f6;
+        }
+
+        .machine-field.nanxing {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 2px solid #10b981;
+        }
+
+        /* CORREÇÃO: Estilos para melhor visibilidade do modal e botões em compras grandes */
+        .compra-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .add-material-btn {
+            position: sticky;
+            bottom: 10px;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .materiais-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
         }
     </style>
 </head>
-<body>
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <div class="w-72 glass-effect shadow-2xl no-print flex flex-col">
-            <div class="p-6 border-b border-gray-700">
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Sistema MADA
-                </h1>
-                <p class="text-gray-400 text-sm mt-1">Gestão Inteligente</p>
+<body class="bg-gray-100 min-h-screen">
+    <div class="flex min-h-screen flex-col md:flex-row">
+        <div class="sidebar w-full md:w-64 bg-gray-950 text-white shadow-lg no-print">
+            <div class="p-4 md:p-6">
+                <h1 class="text-lg md:text-xl font-bold text-gray-100">CONTROLE DE ESTOQUE</h1>
+                <p class="text-gray-400 text-sm mt-1">MADA</p>
             </div>
             
-            <nav class="flex-1 p-4">
-                <ul class="space-y-2">
-                    <li>
-                        <button onclick="showSection('cadastro')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            Cadastro
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="showSection('sobras')" class="sidebar-item active w-full text-left px-4 py-3 rounded-lg flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                            Sobras
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="showSection('plano-corte')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                            Plano de Corte
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="showSection('solicitacoes')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                            </svg>
-                            Solicitações
-                        </button>
-                    </li>
-                </ul>
+            <nav class="mt-4 md:mt-6">
+                <div class="px-3 md:px-4 py-2">
+                    <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-3">MENU</p>
+                    <ul class="space-y-1 md:space-y-2">
+                        <li>
+                            <button id="tab-cadastro" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Cadastro
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-inventario" class="sidebar-item active w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                    Inventário
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-utilizacao" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Lista de Utilização
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-plano-corte" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Plano de Corte
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="tab-compras" class="sidebar-item w-full text-left px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 text-gray-300 hover:text-white">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.182 1.996.809 1.996h12.583a2 2 0 002-2c0-.663-.099-1.298-.282-1.895M10 21a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                                    </svg>
+                                    Compras
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </nav>
             
-            <div class="p-4 border-t border-gray-700">
-                <div class="text-xs text-gray-400">
-                    <div class="font-semibold text-gray-300">Usuário Ativo</div>
-                    <div class="mt-1">ID: <span id="user-id">ADMIN</span></div>
+            <div class="absolute bottom-0 left-0 right-0 p-3 md:p-4 hidden md:block">
+                <div class="text-xs text-gray-500">
+                    ID: <span id="user-id" class="text-gray-400">Carregando...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 overflow-auto">
-            <header class="glass-effect px-8 py-6 no-print shadow-lg">
-                <h1 class="text-3xl font-bold text-light">Sistema de Gestão MADA</h1>
-                <p class="text-muted mt-1">Controle completo de materiais e produção</p>
+        <div class="main-content flex-1 flex flex-col">
+            <header class="bg-white px-4 md:px-8 py-4 md:py-6 no-print shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl md:text-3xl font-bold text-gray-950">Sistema de Gestão</h1>
+                        <p class="text-gray-700 mt-1 text-sm md:text-base">Controle de materiais e sobras</p>
+                    </div>
+                </div>
             </header>
 
-            <main class="p-8">
-                <!-- Seção Cadastro -->
-                <section id="section-cadastro" class="space-y-6 hidden">
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Cadastrar Material</h2>
-                        <form id="material-form" class="space-y-4">
+            <main class="flex-1 p-4 md:p-8">
+                <div id="status-message" class="hidden mb-4 md:mb-6 p-3 md:p-4 rounded-lg font-medium transition-all duration-300"></div>
+                <div id="loading-message" class="text-center p-6 md:p-8">
+                    <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-gray-700 bg-white">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Carregando inventário...
+                    </div>
+                </div>
+
+                <section id="section-cadastro" class="space-y-4 md:space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-6 md:mb-8">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Cadastrar Material</h2>
+                            <p class="text-gray-700 mt-2">Adicione novos materiais ao estoque</p>
+                        </div>
+                        
+                        <form id="material-form" class="space-y-4 md:space-y-6">
                             <div>
-                                <label class="block text-sm font-semibold mb-2">NOME DO MDF</label>
-                                <input type="text" id="nome" required class="w-full px-4 py-3 rounded-lg">
+                                <label for="nome" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO MDF</label>
+                                <input type="text" id="nome" name="nome" value="MDF2F" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
                             </div>
-                            <div class="grid grid-cols-3 gap-4">
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div>
-                                    <label class="block text-sm font-semibold mb-2">COMPRIMENTO (mm)</label>
-                                    <input type="number" id="comprimento" required class="w-full px-4 py-3 rounded-lg">
+                                    <label for="comprimento" class="block text-sm font-semibold text-gray-900 mb-2">COMPRIMENTO (mm)</label>
+                                    <input type="number" id="comprimento" name="comprimento" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold mb-2">LARGURA (mm)</label>
-                                    <input type="number" id="largura" required class="w-full px-4 py-3 rounded-lg">
+                                    <label for="largura" class="block text-sm font-semibold text-gray-900 mb-2">LARGURA (mm)</label>
+                                    <input type="number" id="largura" name="largura" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold mb-2">ESPESSURA (mm)</label>
-                                    <input type="number" id="espessura" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">QUANTIDADE</label>
-                                    <input type="number" id="quantidade" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">LOCALIZAÇÃO</label>
-                                    <input type="text" id="localizacao" class="w-full px-4 py-3 rounded-lg">
+                                    <label for="espessura" class="block text-sm font-semibold text-gray-900 mb-2">ESPESSURA (mm)</label>
+                                    <input type="number" id="espessura" name="espessura" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
                                 </div>
                             </div>
-                            <button type="submit" class="btn-primary w-full py-4 px-6 rounded-lg">
-                                Cadastrar Material
-                            </button>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <div>
+                                    <label for="quantidade" class="block text-sm font-semibold text-gray-900 mb-2">QUANTIDADE</label>
+                                    <input type="number" id="quantidade" name="quantidade" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
+                                </div>
+                                <div>
+                                    <label for="localizacao" class="block text-sm font-semibold text-gray-900 mb-2">LOCALIZAÇÃO</label>
+                                    <input type="text" id="localizacao" name="localizacao" placeholder="Ex: Estante A, Prateleira 1" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-900 mb-3">TIPO</label>
+                                <div class="flex items-center space-x-4 md:space-x-6">
+                                    <div class="flex items-center">
+                                        <input id="tipo-chapa" name="tipo" type="radio" value="Chapa" required class="h-4 w-4 text-gray-950">
+                                        <label for="tipo-chapa" class="ml-3 text-sm font-medium text-gray-900">Chapa</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="tipo-sobra" name="tipo" type="radio" value="Sobra" required class="h-4 w-4 text-gray-950">
+                                        <label for="tipo-sobra" class="ml-3 text-sm font-medium text-gray-900">Sobra</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <button type="submit" id="cadastrar-btn" class="btn-primary w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-950 focus:ring-opacity-50">
+                                    Cadastrar Material
+                                </button>
+                            </div>
                         </form>
                     </div>
 
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Criar Plano de Corte</h2>
-                        <form id="plano-form" class="space-y-4">
+                    <!-- ALTERAÇÃO 1: Removido campo de materiais do formulário de criação de lote -->
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-6 md:mb-8">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Criar Plano de Corte</h2>
+                            <p class="text-gray-700 mt-2">Crie lotes para organizar os cortes</p>
+                        </div>
+                        
+                        <form id="plano-corte-form" class="space-y-4 md:space-y-6">
                             <div>
-                                <label class="block text-sm font-semibold mb-2">NOME DO LOTE</label>
-                                <input type="text" id="nome-lote" placeholder="Ex: LOTE-001" required class="w-full px-4 py-3 rounded-lg">
+                                <label for="nome-lote" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO LOTE</label>
+                                <input type="text" id="nome-lote" name="nome-lote" placeholder="Ex: LOTE18/09" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950">
                             </div>
+
                             <div>
-                                <label class="block text-sm font-semibold mb-2">CLIENTE/AMBIENTE</label>
-                                <textarea id="cliente-ambiente" rows="3" placeholder="Ex: João Silva - Cozinha, Sala" required class="w-full px-4 py-3 rounded-lg"></textarea>
+                                <label for="cliente-ambiente" class="block text-sm font-semibold text-gray-900 mb-2">CLIENTE/AMBIENTE</label>
+                                <textarea id="cliente-ambiente" name="cliente-ambiente" rows="3" placeholder="Ex: João Silva - Cozinha, Sala" required class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white focus:ring-2 focus:ring-gray-950"></textarea>
                             </div>
-                            <button type="submit" class="btn-primary w-full py-4 px-6 rounded-lg">
-                                Criar Plano de Corte
-                            </button>
+
+                            <div class="pt-4">
+                                <button type="submit" id="salvar-lote-btn" class="btn-primary w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gray-950 focus:ring-opacity-50">
+                                    Salvar Lote
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </section>
 
-                <!-- Seção Sobras -->
-                <section id="section-sobras" class="space-y-6">
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Gestão de Sobras</h2>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead>
+                <section id="section-inventario" class="space-y-4 md:space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-4 md:mb-6">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Inventário de Estoque</h2>
+                            <p class="text-gray-700 mt-2">Gerencie seus materiais e sobras</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
+                            <div class="md:col-span-2">
+                                <input type="text" id="search-nome" placeholder="Pesquisar por nome do MDF" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white">
+                            </div>
+                            <div>
+                                <input type="number" id="search-espessura" placeholder="Filtrar por espessura" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="filter-btn" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                    Filtrar
+                                </button>
+                                <button id="clear-filter-btn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-950 font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- ALTERAÇÃO: Melhor responsividade da tabela para mostrar todas as colunas em mobile -->
+                        <div class="overflow-x-auto rounded-lg shadow">
+                            <table class="min-w-full bg-white table-responsive">
+                                <thead class="bg-gray-100">
                                     <tr>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Nome</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Comprimento</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Largura</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Espessura</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Quantidade</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Localização</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Ações</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Comp.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Larg.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Esp.</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Localização</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Qtd</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Data</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider hidden md:table-cell">Status</th>
+                                        <th class="px-2 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="sobras-table" class="divide-y divide-gray-700">
-                                    <tr>
-                                        <td colspan="7" class="px-6 py-12 text-center text-gray-400">Nenhum material cadastrado</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="inventory-table-body" class="bg-white"></tbody>
                             </table>
                         </div>
                     </div>
                 </section>
 
-                <!-- Seção Plano de Corte -->
-                <section id="section-plano-corte" class="space-y-6 hidden">
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Planos de Corte Ativos</h2>
-                        <div id="planos-list" class="space-y-4">
-                            <div class="text-center text-gray-400 py-12">Nenhum plano de corte criado</div>
+                <section id="section-utilizacao" class="space-y-4 md:space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 md:mb-6 space-y-4 md:space-y-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-gray-950">Lista de Utilização</h2>
+                                <p class="text-gray-700 mt-2">Sobras prontas para utilização</p>
+                            </div>
+                            <div class="flex space-x-2 md:space-x-3 no-print">
+                                <button id="print-btn" class="flex items-center px-3 md:px-5 py-2 md:py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                    </svg>
+                                    Imprimir
+                                </button>
+                                <button id="clear-list-btn" class="flex items-center px-3 md:px-5 py-2 md:py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="print-area">
+                            <div class="print-only hidden">
+                                <div class="text-center mb-8">
+                                    <h1 class="text-3xl font-bold text-black mb-2">LISTA DE UTILIZAÇÃO - SOBRAS MADA</h1>
+                                    <p class="text-lg text-black">Data: <span id="print-date"></span></p>
+                                    <hr class="mt-4 border-black">
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto rounded-lg shadow">
+                                <table class="min-w-full bg-white table-responsive">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Nome</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Comp.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Larg.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Esp.</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Local</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Qtd</th>
+                                            <th class="px-2 md:px-4 py-3 md:py-4 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Data Utilização</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="utilizacao-table-body" class="bg-white">
+                                        <tr>
+                                            <td colspan="7" class="px-3 md:px-6 py-8 md:py-12 text-center text-gray-700">Nenhuma sobra na lista de utilização.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Seção Solicitações -->
-                <section id="section-solicitacoes" class="space-y-6 hidden">
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Nova Solicitação</h2>
-                        <form id="solicitacao-form" class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">CLIENTE</label>
-                                    <input type="text" id="sol-cliente" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">AMBIENTE</label>
-                                    <input type="text" id="sol-ambiente" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">NÚMERO DA PEÇA</label>
-                                    <input type="text" id="sol-peca" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold mb-2">MARCENEIRO</label>
-                                    <input type="text" id="sol-marceneiro" required class="w-full px-4 py-3 rounded-lg">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">OBSERVAÇÃO</label>
-                                <textarea id="sol-observacao" rows="3" class="w-full px-4 py-3 rounded-lg"></textarea>
-                            </div>
-                            <button type="submit" class="btn-primary w-full py-4 px-6 rounded-lg">
-                                Criar Solicitação
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Painel de Estatísticas -->
-                    <div id="stats-panel" class="hidden">
-                        <div class="card p-8">
-                            <h2 class="text-2xl font-bold text-light mb-6">📊 Análise de Problemas</h2>
-                            <div class="grid grid-cols-3 gap-6">
-                                <div class="stat-card text-center">
-                                    <div class="text-4xl font-bold text-primary mb-2" id="stat-industria">0</div>
-                                    <div class="text-sm text-muted font-semibold uppercase">Indústria</div>
-                                    <div class="text-xs text-gray-500 mt-1" id="percent-industria">0%</div>
-                                </div>
-                                <div class="stat-card text-center">
-                                    <div class="text-4xl font-bold text-secondary mb-2" id="stat-engenharia">0</div>
-                                    <div class="text-sm text-muted font-semibold uppercase">Engenharia</div>
-                                    <div class="text-xs text-gray-500 mt-1" id="percent-engenharia">0%</div>
-                                </div>
-                                <div class="stat-card text-center">
-                                    <div class="text-4xl font-bold text-warning mb-2" id="stat-marceneiro">0</div>
-                                    <div class="text-sm text-muted font-semibold uppercase">Marceneiro</div>
-                                    <div class="text-xs text-gray-500 mt-1" id="percent-marceneiro">0%</div>
-                                </div>
-                            </div>
+                <!-- ALTERAÇÃO 2: Plano de corte com campos separados para SECCIONADORA e NANXING -->
+                <section id="section-plano-corte" class="space-y-4 md:space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-4 md:mb-6">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Plano de Corte</h2>
+                            <p class="text-gray-700 mt-2">Gerencie os lotes de corte com controle avançado</p>
+                        </div>
+                        
+                        <div id="lotes-list" class="space-y-4">
+                            <div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>
                         </div>
                     </div>
+                </section>
+                
+                <section id="section-compras" class="space-y-4 md:space-y-6 hidden">
+                    <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+                        <div class="mb-4 md:mb-6">
+                            <h2 class="text-xl md:text-2xl font-bold text-gray-950">Controle de Compras</h2>
+                            <p class="text-gray-700 mt-2">Cadastre e gerencie as compras por cliente</p>
+                        </div>
 
-                    <div class="card p-8">
-                        <h2 class="text-2xl font-bold text-light mb-6">Solicitações Ativas</h2>
-                        <div id="solicitacoes-list" class="space-y-4">
-                            <div class="text-center text-gray-400 py-12">Nenhuma solicitação criada</div>
+                        <div id="compra-form-container" class="mb-6 md:mb-8">
+                             <form id="compra-form" class="space-y-4">
+                                <h3 class="text-lg font-bold text-gray-900">Nova Compra</h3>
+                                <div>
+                                    <label for="cliente-nome" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO CLIENTE</label>
+                                    <input type="text" id="cliente-nome" required class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="cliente-ambientes" class="block text-sm font-semibold text-gray-900 mb-2">AMBIENTES</label>
+                                    <input type="text" id="cliente-ambientes" placeholder="Ex: Cozinha, Sala, Quarto" required class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <button type="submit" class="btn-primary bg-gray-950 hover:bg-gray-900 text-white font-semibold rounded-lg">
+                                    Cadastrar Compra
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div id="lista-compras-container" class="space-y-6">
+                            <h3 class="text-lg font-bold text-gray-900">Lista de Compras</h3>
+                             <div class="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
+                                <div class="md:col-span-2">
+                                    <input type="text" id="search-cliente" placeholder="Buscar por nome do cliente..." class="form-input w-full bg-gray-100 rounded-lg">
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button id="filter-cliente-btn" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                        Filtrar
+                                    </button>
+                                    <button id="clear-cliente-filter-btn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-950 font-medium py-2 md:py-3 px-3 md:px-4 rounded-lg transition-colors">
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="compras-list" class="space-y-3">
+                                <div class="text-gray-700 text-center py-6 md:py-8">Nenhuma compra cadastrada.</div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -556,543 +570,953 @@
         </div>
     </div>
 
-    <script>
-        // Sistema de armazenamento
-        const DB = {
-            materiais: JSON.parse(localStorage.getItem('materiais') || '[]'),
-            planos: JSON.parse(localStorage.getItem('planos') || '[]'),
-            solicitacoes: JSON.parse(localStorage.getItem('solicitacoes') || '[]'),
-            
-            save() {
-                localStorage.setItem('materiais', JSON.stringify(this.materiais));
-                localStorage.setItem('planos', JSON.stringify(this.planos));
-                localStorage.setItem('solicitacoes', JSON.stringify(this.solicitacoes));
-            }
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
+            <div class="mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Editar Quantidade</h3>
+                <p class="text-gray-700 text-sm mt-1">Altere a quantidade do material</p>
+            </div>
+            <div class="mb-4 md:mb-6">
+                <label for="edit-quantity" class="block text-sm font-semibold text-gray-900 mb-2">Nova Quantidade:</label>
+                <input type="number" id="edit-quantity" min="0" class="form-input w-full bg-gray-100 rounded-lg transition-colors focus:bg-white">
+            </div>
+            <div class="space-y-3">
+                <button id="save-quantity-btn" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                    Salvar Alteração
+                </button>
+                <button id="cancel-edit-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORREÇÃO 3: Modal melhorado para adicionar item com melhor z-index -->
+    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-96 shadow-xl rounded-xl bg-white">
+            <div class="mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Adicionar Material</h3>
+                <p class="text-gray-700 text-sm mt-1">Adicione um novo item a esta compra</p>
+            </div>
+            <form id="add-item-form" class="space-y-4">
+                <div>
+                    <label for="add-item-nome" class="block text-sm font-semibold text-gray-900 mb-2">NOME DO MDF</label>
+                    <input type="text" id="add-item-nome" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div>
+                    <label for="add-item-espessura" class="block text-sm font-semibold text-gray-900 mb-2">ESPESSURA (mm)</label>
+                    <input type="number" id="add-item-espessura" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div>
+                    <label for="add-item-quantidade" class="block text-sm font-semibold text-gray-900 mb-2">QUANTIDADE</label>
+                    <input type="number" id="add-item-quantidade" required class="form-input w-full bg-gray-100 rounded-lg">
+                </div>
+                <div class="space-y-3 mt-4">
+                    <button type="submit" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                        Adicionar Item
+                    </button>
+                    <button type="button" id="cancel-add-item-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-medium py-2 md:py-3 px-4 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOVO: Modal para editar observações das máquinas SECCIONADORA e NANXING -->
+    <div id="machines-modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 md:top-20 mx-auto p-4 md:p-6 w-80 md:w-[500px] shadow-xl rounded-xl bg-white">
+            <div class="mb-4 md:mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-950">Observações das Máquinas</h3>
+                <p class="text-gray-700 text-sm mt-1">Adicione observações específicas para cada máquina</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="edit-seccionadora" class="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                        SECCIONADORA:
+                    </label>
+                    <textarea id="edit-seccionadora" rows="3" placeholder="Ex: Corte realizado sem problemas, material de boa qualidade..." class="form-input w-full bg-blue-50 rounded-lg transition-colors focus:bg-white machine-field"></textarea>
+                </div>
+                <div>
+                    <label for="edit-nanxing" class="block text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        NANXING:
+                    </label>
+                    <textarea id="edit-nanxing" rows="3" placeholder="Ex: Ajustes realizados na máquina, tempo de corte otimizado..." class="form-input w-full bg-green-50 rounded-lg transition-colors focus:bg-white machine-field nanxing"></textarea>
+                </div>
+            </div>
+            <div class="space-y-3 mt-6">
+                <button id="save-machines-btn" class="w-full bg-gray-950 hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors shadow-sm">
+                    Salvar Observações
+                </button>
+                <button id="cancel-machines-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-950 font-semibold py-2 md:py-3 px-4 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmAzyTEXnwJk2Kh9-yw1tboka9NRhY81M",
+            authDomain: "controle-de-estoque-mada-f0252.firebaseapp.com",
+            projectId: "controle-de-estoque-mada-f0252",
+            storageBucket: "controle-de-estoque-mada-f0252.firebasestorage.app",
+            messagingSenderId: "800947219566",
+            appId: "1:800947219566:web:95075a4a51e2cf165d4a7f",
+            measurementId: "G-159JVE1TL5"
         };
 
-        // Navegação
-        function showSection(section) {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-            
-            document.getElementById(`section-${section}`).classList.remove('hidden');
-            event.target.closest('.sidebar-item').classList.add('active');
-            
-            if (section === 'sobras') loadSobras();
-            if (section === 'plano-corte') loadPlanos();
-            if (section === 'solicitacoes') {
-                loadSolicitacoes();
-                updateStats();
-            }
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Cadastro de Material
-        document.getElementById('material-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const material = {
-                id: Date.now(),
-                nome: document.getElementById('nome').value,
-                comprimento: document.getElementById('comprimento').value,
-                largura: document.getElementById('largura').value,
-                espessura: document.getElementById('espessura').value,
-                quantidade: document.getElementById('quantidade').value,
-                localizacao: document.getElementById('localizacao').value,
-                data: new Date().toLocaleDateString('pt-BR')
-            };
-            
-            DB.materiais.push(material);
-            DB.save();
-            
-            alert('Material cadastrado com sucesso!');
-            e.target.reset();
-            loadSobras();
+        const form = document.getElementById('material-form');
+        const planoCorteForm = document.getElementById('plano-corte-form');
+        const inventoryTableBody = document.getElementById('inventory-table-body');
+        const utilizacaoTableBody = document.getElementById('utilizacao-table-body');
+        const searchNomeInput = document.getElementById('search-nome');
+        const searchEspessuraInput = document.getElementById('search-espessura');
+        const tabCadastroBtn = document.getElementById('tab-cadastro');
+        const tabInventarioBtn = document.getElementById('tab-inventario');
+        const tabUtilizacaoBtn = document.getElementById('tab-utilizacao');
+        const tabPlanoCorteBtn = document.getElementById('tab-plano-corte');
+        const tabComprasBtn = document.getElementById('tab-compras');
+        const sectionCadastro = document.getElementById('section-cadastro');
+        const sectionInventario = document.getElementById('section-inventario');
+        const sectionUtilizacao = document.getElementById('section-utilizacao');
+        const sectionPlanoCorte = document.getElementById('section-plano-corte');
+        const sectionCompras = document.getElementById('section-compras');
+        const statusMessage = document.getElementById('status-message');
+        const editModal = document.getElementById('edit-modal');
+        const editQuantityInput = document.getElementById('edit-quantity');
+        const loadingMessage = document.getElementById('loading-message');
+        const lotesListEl = document.getElementById('lotes-list');
+
+        // Elements for Compras
+        const compraForm = document.getElementById('compra-form');
+        const comprasListEl = document.getElementById('compras-list');
+        const searchClienteInput = document.getElementById('search-cliente');
+        const filterClienteBtn = document.getElementById('filter-cliente-btn');
+        const clearClienteFilterBtn = document.getElementById('clear-cliente-filter-btn');
+
+        // NOVO: Elements for machines modal
+        const machinesModal = document.getElementById('machines-modal');
+        const editSeccionadoraInput = document.getElementById('edit-seccionadora');
+        const editNanxingInput = document.getElementById('edit-nanxing');
+
+        let userId = null;
+        let inventory = [];
+        let utilizacaoList = [];
+        let lotesList = [];
+        let compras = [];
+        let currentEditingItem = null;
+        let currentEditingLote = null; // NOVO: para observações das máquinas
+
+        signInAnonymously(auth).catch(console.error);
+
+        onAuthStateChanged(auth, (user) => {
+            if(user){
+                userId = user.uid;
+                document.getElementById('user-id').textContent = userId;
+                listenInventory();
+                listenUtilizacao();
+                listenLotes();
+                listenCompras();
+                setTimeout(() => {
+                    loadingMessage.style.display = 'none';
+                }, 1000);
+            } else {
+                document.getElementById('user-id').textContent = 'Não Autenticado';
+            }
         });
 
-        // Criar Plano de Corte
-        document.getElementById('plano-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const plano = {
-                id: Date.now(),
-                nome: document.getElementById('nome-lote').value,
-                cliente: document.getElementById('cliente-ambiente').value,
-                status: 'aguardando',
-                expanded: false,
-                fases: {
-                    corte: {
-                        status: 'pendente',
-                        seccionadora: { obs: '' },
-                        nanxing: { obs: '' }
-                    },
-                    filetacao: {
-                        status: 'pendente',
-                        obs: ''
-                    },
-                    usinagem: {
-                        status: 'pendente',
-                        obs: ''
+        function getFormattedDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('pt-BR');
+            const time = now.toLocaleTimeString('pt-BR');
+            return `${date} ${time}`;
+        }
+        
+        function listenInventory(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/inventory');
+            onSnapshot(colRef, (snapshot) => {
+                inventory = [];
+                snapshot.forEach(docSnap => inventory.push({id: docSnap.id, ...docSnap.data()}));
+                renderInventory();
+            });
+        }
+
+        function listenUtilizacao(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/utilizacao');
+            onSnapshot(colRef, (snapshot) => {
+                utilizacaoList = [];
+                snapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    if (!data.timestamp) {
+                        data.timestamp = new Date().toISOString();
                     }
-                },
-                criado: new Date().toISOString()
-            };
-            
-            DB.planos.push(plano);
-            DB.save();
-            
-            alert('Plano de corte criado com sucesso!');
-            e.target.reset();
-            loadPlanos();
-        });
-
-        // Criar Solicitação
-        document.getElementById('solicitacao-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const solicitacao = {
-                id: Date.now(),
-                cliente: document.getElementById('sol-cliente').value,
-                ambiente: document.getElementById('sol-ambiente').value,
-                peca: document.getElementById('sol-peca').value,
-                marceneiro: document.getElementById('sol-marceneiro').value,
-                observacao: document.getElementById('sol-observacao').value,
-                status: 'solicitado',
-                problema: null,
-                resolucao: '',
-                criado: new Date().toISOString()
-            };
-            
-            DB.solicitacoes.push(solicitacao);
-            DB.save();
-            
-            alert('Solicitação criada com sucesso!');
-            e.target.reset();
-            loadSolicitacoes();
-            updateStats();
-        });
-
-        // Carregar Sobras
-        function loadSobras() {
-            const tbody = document.getElementById('sobras-table');
-            
-            if (DB.materiais.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-gray-400">Nenhum material cadastrado</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = DB.materiais.map(m => `
-                <tr class="transition">
-                    <td class="px-6 py-4 font-medium">${m.nome}</td>
-                    <td class="px-6 py-4">${m.comprimento}mm</td>
-                    <td class="px-6 py-4">${m.largura}mm</td>
-                    <td class="px-6 py-4">${m.espessura}mm</td>
-                    <td class="px-6 py-4">${m.quantidade}</td>
-                    <td class="px-6 py-4">${m.localizacao || '-'}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="deleteMaterial(${m.id})" class="delete-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                            Excluir
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+                    utilizacaoList.push({id: docSnap.id, ...data});
+                });
+                renderUtilizacao();
+            });
         }
 
-        // Toggle Plano
-        function togglePlano(planoId) {
-            const plano = DB.planos.find(p => p.id === planoId);
-            plano.expanded = !plano.expanded;
-            DB.save();
-            loadPlanos();
+        function listenLotes(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/lotes');
+            onSnapshot(colRef, (snapshot) => {
+                lotesList = [];
+                snapshot.forEach(docSnap => lotesList.push({id: docSnap.id, ...docSnap.data()}));
+                renderLotes();
+            });
         }
 
-        // Carregar Planos (com collapse)
-        function loadPlanos() {
-            const container = document.getElementById('planos-list');
+        function listenCompras(){
+            const colRef = collection(db, 'artifacts/default-app-id/public/data/compras');
+            onSnapshot(colRef, (snapshot) => {
+                compras = [];
+                snapshot.forEach(docSnap => compras.push({id: docSnap.id, ...docSnap.data()}));
+                renderCompras();
+            });
+        }
+
+        function getStatusBadge(quantidade, tipo) {
+            if (tipo === 'Sobra') return '';
             
-            if (DB.planos.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 py-12">Nenhum plano de corte criado</div>';
-                return;
+            if (quantidade <= 10) {
+                return '<span class="status-badge status-baixo">ESTOQUE BAIXO</span>';
+            } else if (quantidade <= 15) {
+                return '<span class="status-badge status-medio">ESTOQUE MÉDIO</span>';
+            } else {
+                return '<span class="status-badge status-alto">ESTOQUE ALTO</span>';
             }
-            
-            container.innerHTML = DB.planos.map(plano => {
-                const progress = calcularProgresso(plano);
-                const isExpanded = plano.expanded;
+        }
+
+        function getStatusLoteBadge(status) {
+            switch(status) {
+                case 'AGUARDANDO':
+                    return '<span class="status-badge status-aguardando">AGUARDANDO</span>';
+                case 'CORTANDO':
+                    return '<span class="status-badge status-cortando">CORTANDO</span>';
+                case 'FINALIZADO':
+                    return '<span class="status-badge status-finalizado">FINALIZADO</span>';
+                default:
+                    return '<span class="status-badge status-aguardando">AGUARDANDO</span>';
+            }
+        }
+
+        // NOVO: Função para calcular progresso do lote
+        function getProgressPercentage(status) {
+            switch(status) {
+                case 'AGUARDANDO': return 10;
+                case 'CORTANDO': return 60;
+                case 'FINALIZADO': return 100;
+                default: return 10;
+            }
+        }
+
+        inventoryTableBody.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const id = e.target.dataset.id;
+                if (confirm('Tem certeza de que deseja excluir este item?')) {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
+                    await deleteDoc(docRef);
+                    showStatus('Material excluído com sucesso!', 'bg-red-100 text-red-700');
+                }
+            }
+
+            if (e.target.classList.contains('edit-btn')) {
+                const id = e.target.dataset.id;
+                currentEditingItem = inventory.find(item => item.id === id);
+                if (currentEditingItem) {
+                    editQuantityInput.value = currentEditingItem.quantidade;
+                    editModal.classList.remove('hidden');
+                }
+            }
+
+            if (e.target.classList.contains('utilize-btn')) {
+                const id = e.target.dataset.id;
+                const itemToUtilize = inventory.find(item => item.id === id);
                 
-                return `
-                    <div class="border-2 border-gray-700 rounded-xl overflow-hidden">
-                        <!-- Header Colapsável -->
-                        <div onclick="togglePlano(${plano.id})" class="collapsible-plan p-6 flex justify-between items-center">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-4">
-                                    <svg class="w-5 h-5 text-primary transition-transform ${isExpanded ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                if (itemToUtilize && confirm('Tem certeza de que deseja mover esta sobra para a lista de utilização?')) {
+                    const utilizacaoData = {
+                        ...itemToUtilize,
+                        dataUtilizacao: getFormattedDateTime(),
+                        timestamp: new Date().toISOString(),
+                        originalId: itemToUtilize.id
+                    };
+                    delete utilizacaoData.id;
+                    
+                    await addDoc(collection(db, 'artifacts/default-app-id/public/data/utilizacao'), utilizacaoData);
+                    
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', id);
+                    await deleteDoc(docRef);
+                    
+                    showStatus('Sobra movida para lista de utilização!', 'bg-blue-100 text-blue-700');
+                }
+            }
+        });
+
+        document.getElementById('save-quantity-btn').addEventListener('click', async () => {
+            if (currentEditingItem) {
+                const newQuantity = parseInt(editQuantityInput.value);
+                if (newQuantity >= 0) {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/inventory', currentEditingItem.id);
+                    await updateDoc(docRef, { quantidade: newQuantity });
+                    showStatus('Quantidade atualizada com sucesso!', 'bg-green-100 text-green-700');
+                    editModal.classList.add('hidden');
+                    currentEditingItem = null;
+                } else {
+                    showStatus('A quantidade deve ser maior ou igual a zero.', 'bg-red-100 text-red-700');
+                }
+            }
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            currentEditingItem = null;
+        });
+
+        // NOVO: Event listeners para modal das máquinas
+        document.getElementById('save-machines-btn').addEventListener('click', async () => {
+            if (currentEditingLote) {
+                const seccionadoraObs = editSeccionadoraInput.value.trim();
+                const nanxingObs = editNanxingInput.value.trim();
+                const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', currentEditingLote.id);
+                await updateDoc(docRef, { 
+                    observacaoSeccionadora: seccionadoraObs,
+                    observacaoNanxing: nanxingObs
+                });
+                showStatus('Observações das máquinas atualizadas com sucesso!', 'bg-green-100 text-green-700');
+                machinesModal.classList.add('hidden');
+                currentEditingLote = null;
+            }
+        });
+
+        document.getElementById('cancel-machines-btn').addEventListener('click', () => {
+            machinesModal.classList.add('hidden');
+            currentEditingLote = null;
+        });
+
+        document.getElementById('print-btn').addEventListener('click', () => {
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('pt-BR');
+            document.querySelector('.print-only').classList.remove('hidden');
+            window.print();
+            document.querySelector('.print-only').classList.add('hidden');
+        });
+
+        document.getElementById('clear-list-btn').addEventListener('click', async () => {
+            if (utilizacaoList.length === 0) {
+                showStatus('Lista já está vazia.', 'bg-yellow-100 text-yellow-700');
+                return;
+            }
+            
+            if (confirm('Tem certeza de que deseja limpar toda a lista de utilização? Esta ação não pode ser desfeita.')) {
+                for (const item of utilizacaoList) {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/utilizacao', item.id);
+                    await deleteDoc(docRef);
+                }
+                showStatus('Lista de utilização limpa com sucesso!', 'bg-green-100 text-green-700');
+            }
+        });
+
+        const clearFilterBtn = document.getElementById('clear-filter-btn');
+        clearFilterBtn.addEventListener('click', () => {
+            searchNomeInput.value = '';
+            searchEspessuraInput.value = '';
+            renderInventory();
+        });
+
+        const filterBtn = document.getElementById('filter-btn');
+        filterBtn.addEventListener('click', () => {
+            renderInventory();
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const submitBtn = document.getElementById('cadastrar-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cadastrando...';
+            
+            try {
+                const data = {
+                    nome: form.nome.value.toUpperCase(),
+                    comprimento: parseInt(form.comprimento.value),
+                    largura: parseInt(form.largura.value),
+                    espessura: parseInt(form.espessura.value),
+                    quantidade: parseInt(form.quantidade.value),
+                    tipo: form.tipo.value,
+                    localizacao: form.localizacao.value || 'Não informada',
+                    dataCadastro: getFormattedDateTime()
+                };
+                
+                await addDoc(collection(db, 'artifacts/default-app-id/public/data/inventory'), data);
+                form.reset();
+                form.nome.value = 'MDF2F';
+                showStatus('Material cadastrado com sucesso!', 'bg-green-100 text-green-700');
+                switchTab('inventario');
+            } catch (error) {
+                console.error('Erro ao cadastrar:', error);
+                showStatus('Erro ao cadastrar material. Tente novamente.', 'bg-red-100 text-red-700');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Cadastrar Material';
+            }
+        });
+
+        // ALTERAÇÃO 1: Plano de Corte Form - removido campo materiais e observação
+        planoCorteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const submitBtn = document.getElementById('salvar-lote-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Salvando...';
+            
+            try {
+                const data = {
+                    nomeLote: planoCorteForm['nome-lote'].value.toUpperCase(),
+                    clienteAmbiente: planoCorteForm['cliente-ambiente'].value,
+                    observacaoSeccionadora: '', // NOVO: Campo observação SECCIONADORA inicia vazio
+                    observacaoNanxing: '', // NOVO: Campo observação NANXING inicia vazio
+                    status: 'AGUARDANDO',
+                    dataCriacao: getFormattedDateTime()
+                };
+                
+                await addDoc(collection(db, 'artifacts/default-app-id/public/data/lotes'), data);
+                planoCorteForm.reset();
+                showStatus('Lote criado com sucesso!', 'bg-green-100 text-green-700');
+                switchTab('plano-corte');
+            } catch (error) {
+                console.error('Erro ao criar lote:', error);
+                showStatus('Erro ao criar lote. Tente novamente.', 'bg-red-100 text-red-700');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Salvar Lote';
+            }
+        });
+
+        function renderInventory(){
+            const term = searchNomeInput.value.toLowerCase();
+            const esp = parseInt(searchEspessuraInput.value);
+            const filtered = inventory.filter(i => i.nome.toLowerCase().includes(term) && (isNaN(esp) || i.espessura === esp));
+            inventoryTableBody.innerHTML = '';
+            
+            if(filtered.length === 0){
+                inventoryTableBody.innerHTML = `<tr><td colspan="10" class="px-3 md:px-6 py-6 md:py-8 text-center text-gray-700">Nenhum material encontrado.</td></tr>`;
+                return;
+            }
+            
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                tr.innerHTML = `
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.comprimento}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.largura}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 hidden md:table-cell">${item.localizacao || 'Não informada'}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full ${item.tipo === 'Chapa' ? 'bg-gray-800 text-white' : 'bg-gray-300 text-gray-950'}">${item.tipo}</span>
+                </td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 hidden md:table-cell">${item.dataCadastro}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-sm hidden md:table-cell">${getStatusBadge(item.quantidade, item.tipo)}</td>
+                <td class="px-2 md:px-6 py-3 md:py-4 whitespace-nowrap text-right text-sm space-x-1">
+                    <button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors edit-btn" data-id="${item.id}">Edit</button>
+                    ${item.tipo === 'Sobra' ? `<button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors mr-1 utilize-btn" data-id="${item.id}">Usar</button>` : ''}
+                    <button class="inline-flex items-center px-1 md:px-3 py-1 md:py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors delete-btn" data-id="${item.id}">Del</button>
+                </td>`;
+                inventoryTableBody.appendChild(tr);
+            });
+        }
+
+        function renderUtilizacao(){
+            utilizacaoTableBody.innerHTML = '';
+            if(utilizacaoList.length === 0){
+                utilizacaoTableBody.innerHTML = `<tr><td colspan="7" class="px-3 md:px-6 py-8 md:py-12 text-center text-gray-700">Nenhuma sobra na lista de utilização.</td></tr>`;
+                return;
+            }
+            utilizacaoList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                tr.innerHTML = `
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.nome}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.comprimento}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.largura}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.espessura}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800 font-medium">${item.localizacao || 'Não informada'}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm font-semibold text-gray-950">${item.quantidade}</td>
+                <td class="px-2 md:px-4 py-3 md:py-4 whitespace-nowrap text-sm text-gray-800">${item.dataUtilizacao}</td>`;
+                utilizacaoTableBody.appendChild(tr);
+            });
+        }
+
+        // ALTERAÇÃO 2: Função renderLotes com campos separados para SECCIONADORA e NANXING
+        function renderLotes(){
+            lotesListEl.innerHTML = '';
+            if(lotesList.length === 0){
+                lotesListEl.innerHTML = '<div class="text-gray-700 text-center py-6 md:py-8">Nenhum lote criado.</div>';
+                return;
+            }
+            
+            lotesList.forEach(lote => {
+                const progress = getProgressPercentage(lote.status);
+                const loteDiv = document.createElement('div');
+                loteDiv.className = 'bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow';
+                
+                loteDiv.innerHTML = `
+                    <!-- Cabeçalho do lote (sempre visível) -->
+                    <div class="p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="toggleLoteDetails('${lote.id}')">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-gray-600 chevron-icon" id="chevron-${lote.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-900">${lote.nomeLote}</h4>
+                                    <p class="text-sm text-gray-600">Criado em: ${lote.dataCriacao}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                ${getStatusLoteBadge(lote.status)}
+                                <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="event.stopPropagation(); deleteLote('${lote.id}')">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
-                                    <div>
-                                        <h3 class="text-xl font-bold text-light">${plano.nome}</h3>
-                                        <p class="text-muted mt-1">${plano.cliente}</p>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Barra de progresso -->
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progresso do Lote</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline visual -->
+                        <div class="flex items-center justify-between mt-4 px-2">
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'AGUARDANDO' || lote.status === 'CORTANDO' || lote.status === 'FINALIZADO' ? 'completed' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Aguardando</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'CORTANDO' || lote.status === 'FINALIZADO' ? 'completed' : lote.status === 'CORTANDO' ? 'active' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Cortando</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="timeline-dot ${lote.status === 'FINALIZADO' ? 'completed' : ''}"></div>
+                                <span class="text-xs text-gray-600 mt-1">Finalizado</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detalhes do lote (colapsado por padrão) -->
+                    <div class="collapsible-content" id="details-${lote.id}">
+                        <div class="px-4 pb-4 border-t border-gray-200 bg-white">
+                            <div class="mt-4">
+                                <div>
+                                    <h5 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        Cliente/Ambiente:
+                                    </h5>
+                                    <p class="text-sm text-gray-700 bg-blue-50 p-3 rounded border border-blue-200 mb-4">${lote.clienteAmbiente}</p>
+                                </div>
+                            </div>
+                            
+                            <!-- NOVO: Campos separados para observações das máquinas -->
+                            <div class="mt-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="font-semibold text-gray-900 flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                        </svg>
+                                        Observações das Máquinas:
+                                    </h5>
+                                    <button class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition-colors" onclick="openMachinesModal('${lote.id}')">
+                                        ${(lote.observacaoSeccionadora || lote.observacaoNanxing) ? 'Editar' : 'Adicionar'}
+                                    </button>
+                                </div>
+                                
+                                <!-- Campo SECCIONADORA -->
+                                <div class="mb-3">
+                                    <div class="flex items-center mb-1">
+                                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">SECCIONADORA:</span>
+                                    </div>
+                                    <div class="machine-field p-3 rounded border-2 border-dashed min-h-[50px] flex items-center">
+                                        ${lote.observacaoSeccionadora ? `<p class="text-sm text-gray-800">${lote.observacaoSeccionadora}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação da seccionadora.</p>'}
                                     </div>
                                 </div>
-                                <div class="mt-4 space-y-2 ml-9">
-                                    <div class="flex justify-between text-sm text-muted">
-                                        <span>Progresso Geral</span>
-                                        <span class="font-semibold">${progress}%</span>
+                                
+                                <!-- Campo NANXING -->
+                                <div class="mb-4">
+                                    <div class="flex items-center mb-1">
+                                        <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">NANXING:</span>
                                     </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${progress}%"></div>
+                                    <div class="machine-field nanxing p-3 rounded border-2 border-dashed min-h-[50px] flex items-center">
+                                        ${lote.observacaoNanxing ? `<p class="text-sm text-gray-800">${lote.observacaoNanxing}</p>` : '<p class="text-sm text-gray-500 italic">Nenhuma observação da Nanxing.</p>'}
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="event.stopPropagation(); deletePlano(${plano.id})" class="delete-btn text-white px-4 py-2 rounded-lg text-sm font-semibold ml-4">
-                                Excluir
-                            </button>
-                        </div>
-                        
-                        <!-- Conteúdo Expansível -->
-                        <div class="plan-content ${isExpanded ? 'expanded' : ''}" id="plan-${plano.id}">
-                            <div class="p-6 pt-0 space-y-6">
-                                
-                                <!-- CORTE -->
-                                <div class="phase-card ${plano.fases.corte.status === 'em-andamento' ? 'active' : plano.fases.corte.status === 'finalizado' ? 'completed' : ''}">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h4 class="text-lg font-bold text-light">🔪 CORTE</h4>
-                                        <span class="status-badge status-${plano.fases.corte.status}">${plano.fases.corte.status}</span>
+                            
+                            <div class="flex space-x-2 pt-4">
+                                ${lote.status === 'AGUARDANDO' ? `
+                                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center" onclick="updateLoteStatus('${lote.id}', 'CORTANDO')">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6-4h10a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
+                                        </svg>
+                                        Iniciar Corte
+                                    </button>
+                                ` : ''}
+                                ${lote.status === 'CORTANDO' ? `
+                                    <button class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center" onclick="updateLoteStatus('${lote.id}', 'FINALIZADO')">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Finalizar Lote
+                                    </button>
+                                ` : ''}
+                                ${lote.status === 'FINALIZADO' ? `
+                                    <div class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg text-center flex items-center justify-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Lote Concluído
                                     </div>
-                                    
-                                    ${plano.fases.corte.status === 'pendente' ? `
-                                        <button onclick="iniciarFase(${plano.id}, 'corte')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                            Iniciar Corte
-                                        </button>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.corte.status === 'em-andamento' ? `
-                                        <div class="space-y-4">
-                                            <div>
-                                                <label class="machine-label machine-seccionadora">SECCIONADORA</label>
-                                                <textarea 
-                                                    id="obs-sec-${plano.id}" 
-                                                    placeholder="Observações da Seccionadora..." 
-                                                    class="w-full mt-2 px-4 py-3 rounded-lg"
-                                                    rows="2"
-                                                >${plano.fases.corte.seccionadora.obs}</textarea>
-                                            </div>
-                                            
-                                            <div>
-                                                <label class="machine-label machine-nanxing">NANXING</label>
-                                                <textarea 
-                                                    id="obs-nan-${plano.id}" 
-                                                    placeholder="Observações da Nanxing..." 
-                                                    class="w-full mt-2 px-4 py-3 rounded-lg"
-                                                    rows="2"
-                                                >${plano.fases.corte.nanxing.obs}</textarea>
-                                            </div>
-                                            
-                                            <button onclick="finalizarFase(${plano.id}, 'corte')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                                Finalizar Corte
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.corte.status === 'finalizado' ? `
-                                        <div class="space-y-2">
-                                            ${plano.fases.corte.seccionadora.obs ? `
-                                                <div class="observation-box">
-                                                    <div class="machine-label machine-seccionadora mb-2">SECCIONADORA</div>
-                                                    <p class="text-gray-300 text-sm">${plano.fases.corte.seccionadora.obs}</p>
-                                                </div>
-                                            ` : ''}
-                                            ${plano.fases.corte.nanxing.obs ? `
-                                                <div class="observation-box">
-                                                    <div class="machine-label machine-nanxing mb-2">NANXING</div>
-                                                    <p class="text-gray-300 text-sm">${plano.fases.corte.nanxing.obs}</p>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    ` : ''}
-                                </div>
-
-                                <!-- FILETAÇÃO -->
-                                <div class="phase-card ${plano.fases.filetacao.status === 'em-andamento' ? 'active' : plano.fases.filetacao.status === 'finalizado' ? 'completed' : ''}">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h4 class="text-lg font-bold text-light">📏 FILETAÇÃO</h4>
-                                        <span class="status-badge status-${plano.fases.filetacao.status}">${plano.fases.filetacao.status}</span>
-                                    </div>
-                                    
-                                    ${plano.fases.filetacao.status === 'pendente' && plano.fases.corte.status === 'finalizado' ? `
-                                        <button onclick="iniciarFase(${plano.id}, 'filetacao')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                            Iniciar Filetação
-                                        </button>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.filetacao.status === 'em-andamento' ? `
-                                        <div class="space-y-4">
-                                            <textarea 
-                                                id="obs-fil-${plano.id}" 
-                                                placeholder="Observações da Filetação..." 
-                                                class="w-full px-4 py-3 rounded-lg"
-                                                rows="2"
-                                            >${plano.fases.filetacao.obs}</textarea>
-                                            
-                                            <button onclick="finalizarFase(${plano.id}, 'filetacao')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                                Finalizar Filetação
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.filetacao.status === 'finalizado' && plano.fases.filetacao.obs ? `
-                                        <div class="observation-box">
-                                            <p class="text-gray-300 text-sm">${plano.fases.filetacao.obs}</p>
-                                        </div>
-                                    ` : ''}
-                                </div>
-
-                                <!-- USINAGEM -->
-                                <div class="phase-card ${plano.fases.usinagem.status === 'em-andamento' ? 'active' : plano.fases.usinagem.status === 'finalizado' ? 'completed' : ''}">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h4 class="text-lg font-bold text-light">⚙️ USINAGEM</h4>
-                                        <span class="status-badge status-${plano.fases.usinagem.status}">${plano.fases.usinagem.status}</span>
-                                    </div>
-                                    
-                                    ${plano.fases.usinagem.status === 'pendente' && plano.fases.filetacao.status === 'finalizado' ? `
-                                        <button onclick="iniciarFase(${plano.id}, 'usinagem')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                            Iniciar Usinagem
-                                        </button>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.usinagem.status === 'em-andamento' ? `
-                                        <div class="space-y-4">
-                                            <textarea 
-                                                id="obs-usi-${plano.id}" 
-                                                placeholder="Observações da Usinagem..." 
-                                                class="w-full px-4 py-3 rounded-lg"
-                                                rows="2"
-                                            >${plano.fases.usinagem.obs}</textarea>
-                                            
-                                            <button onclick="finalizarFase(${plano.id}, 'usinagem')" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                                Finalizar Usinagem
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${plano.fases.usinagem.status === 'finalizado' ? `
-                                        ${plano.fases.usinagem.obs ? `
-                                            <div class="observation-box">
-                                                <p class="text-gray-300 text-sm">${plano.fases.usinagem.obs}</p>
-                                            </div>
-                                        ` : ''}
-                                        <div class="mt-4 p-4 bg-green-900/30 border-2 border-green-500 rounded-lg text-center">
-                                            <p class="text-green-400 font-bold text-lg">✓ Plano Concluído!</p>
-                                        </div>
-                                    ` : ''}
-                                </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
                 `;
-            }).join('');
+                lotesListEl.appendChild(loteDiv);
+            });
         }
 
-        // Atualizar estatísticas
-        function updateStats() {
-            const solicitacoesComProblema = DB.solicitacoes.filter(s => s.problema);
-            const total = solicitacoesComProblema.length;
-            
-            if (total === 0) {
-                document.getElementById('stats-panel').classList.add('hidden');
+        // CORREÇÃO 3: Função renderCompras melhorada para evitar problemas com botão de adicionar material
+        function renderCompras(filterTerm = '') {
+            comprasListEl.innerHTML = '';
+            const filteredCompras = compras.filter(c => c.cliente.nome.toLowerCase().includes(filterTerm.toLowerCase()));
+
+            if (filteredCompras.length === 0) {
+                comprasListEl.innerHTML = '<div class="text-gray-700 text-center py-6 md:py-8">Nenhuma compra encontrada.</div>';
                 return;
             }
-            
-            document.getElementById('stats-panel').classList.remove('hidden');
-            
-            const industria = solicitacoesComProblema.filter(s => s.problema === 'industria').length;
-            const engenharia = solicitacoesComProblema.filter(s => s.problema === 'engenharia').length;
-            const marceneiro = solicitacoesComProblema.filter(s => s.problema === 'marceneiro').length;
-            
-            document.getElementById('stat-industria').textContent = industria;
-            document.getElementById('stat-engenharia').textContent = engenharia;
-            document.getElementById('stat-marceneiro').textContent = marceneiro;
-            
-            document.getElementById('percent-industria').textContent = `${((industria/total)*100).toFixed(1)}%`;
-            document.getElementById('percent-engenharia').textContent = `${((engenharia/total)*100).toFixed(1)}%`;
-            document.getElementById('percent-marceneiro').textContent = `${((marceneiro/total)*100).toFixed(1)}%`;
-        }
 
-        // Carregar Solicitações
-        function loadSolicitacoes() {
-            const container = document.getElementById('solicitacoes-list');
-            
-            if (DB.solicitacoes.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 py-12">Nenhuma solicitação criada</div>';
-                return;
-            }
-            
-            container.innerHTML = DB.solicitacoes.map(sol => `
-                <div class="border-2 border-gray-700 rounded-xl p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <h3 class="text-lg font-bold text-light">${sol.cliente} - ${sol.ambiente}</h3>
-                                <span class="status-badge status-${sol.status}">${sol.status}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div>
-                                    <span class="text-muted">Peça:</span>
-                                    <span class="font-semibold text-light"> ${sol.peca}</span>
-                                </div>
-                                <div>
-                                    <span class="text-muted">Marceneiro:</span>
-                                    <span class="font-semibold text-light"> ${sol.marceneiro}</span>
-                                </div>
-                            </div>
-                            ${sol.observacao ? `
-                                <div class="mt-3 observation-box">
-                                    <p class="text-gray-300 text-sm">${sol.observacao}</p>
-                                </div>
-                            ` : ''}
-                        </div>
-                        <button onclick="deleteSolicitacao(${sol.id})" class="delete-btn text-white px-4 py-2 rounded-lg text-sm font-semibold ml-4">
-                            Excluir
-                        </button>
-                    </div>
-
-                    ${sol.status === 'solicitado' ? `
-                        <button onclick="iniciarSolicitacao(${sol.id})" class="btn-primary w-full py-3 px-6 rounded-lg">
-                            Iniciar Atendimento
-                        </button>
-                    ` : ''}
-
-                    ${sol.status === 'iniciado' ? `
-                        <div class="space-y-4 mt-4">
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">Local do Problema:</label>
-                                <select id="problema-${sol.id}" class="w-full px-4 py-3 rounded-lg">
-                                    <option value="">Selecione...</option>
-                                    <option value="industria" ${sol.problema === 'industria' ? 'selected' : ''}>INDÚSTRIA</option>
-                                    <option value="engenharia" ${sol.problema === 'engenharia' ? 'selected' : ''}>ENGENHARIA</option>
-                                    <option value="marceneiro" ${sol.problema === 'marceneiro' ? 'selected' : ''}>MARCENEIRO</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">Como foi resolvido:</label>
-                                <textarea 
-                                    id="resolucao-${sol.id}" 
-                                    rows="3" 
-                                    class="w-full px-4 py-3 rounded-lg"
-                                    placeholder="Descreva como o problema foi resolvido..."
-                                >${sol.resolucao}</textarea>
-                            </div>
-                            <button onclick="concluirSolicitacao(${sol.id})" class="btn-primary w-full py-3 px-6 rounded-lg">
-                                Concluir Solicitação
+            filteredCompras.forEach((compra) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'bg-gray-50 rounded-xl border border-gray-200 overflow-hidden compra-container';
+                
+                const materiaisList = compra.materiais.map((material, matIndex) => `
+                    <li class="flex items-center justify-between p-2 md:p-3 bg-white rounded-lg border">
+                        <span class="text-sm md:text-base font-medium text-gray-800">${material.nome} - ${material.espessura}mm</span>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" value="${material.quantidade}" 
+                                class="w-16 text-center text-sm md:text-base bg-gray-100 rounded-md p-1 border"
+                                onchange="updateItemQuantity('${compra.id}', ${matIndex}, this.value)">
+                            <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="removeItemFromCompra('${compra.id}', ${matIndex})">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
                             </button>
                         </div>
-                    ` : ''}
+                    </li>
+                `).join('');
 
-                    ${sol.status === 'concluido' ? `
-                        <div class="mt-4 space-y-3">
-                            ${sol.problema ? `
-                                <div class="p-4 bg-yellow-900/30 border-l-4 border-yellow-500 rounded">
-                                    <p class="text-sm text-light"><span class="font-semibold">Problema identificado em:</span> ${sol.problema.toUpperCase()}</p>
-                                </div>
-                            ` : ''}
-                            ${sol.resolucao ? `
-                                <div class="p-4 bg-green-900/30 border-l-4 border-green-500 rounded">
-                                    <p class="text-sm font-semibold mb-1 text-light">Resolução:</p>
-                                    <p class="text-sm text-gray-300">${sol.resolucao}</p>
-                                </div>
-                            ` : ''}
+                itemDiv.innerHTML = `
+                    <!-- Cabeçalho da compra (sempre visível) -->
+                    <div class="p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="toggleCompraDetails('${compra.id}')">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-gray-600 chevron-icon" id="chevron-compra-${compra.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                                <h4 class="text-lg font-bold text-gray-900">${compra.cliente.nome}</h4>
+                            </div>
+                            <button class="text-red-500 hover:text-red-700 transition-colors p-1" onclick="event.stopPropagation(); deleteCompra('${compra.id}')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
                         </div>
-                    ` : ''}
-                </div>
-            `).join('');
+                        <p class="text-sm text-gray-600 mt-1">Cadastrado em: ${compra.dataHora}</p>
+                    </div>
+                    
+                    <!-- Detalhes da compra (colapsado por padrão) -->
+                    <div class="collapsible-content" id="details-compra-${compra.id}">
+                        <div class="px-4 pb-4 border-t border-gray-200">
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-700 mb-4"><strong>Ambientes:</strong> ${compra.cliente.ambientes}</p>
+                                
+                                <h5 class="font-semibold text-gray-900 mb-3">Materiais:</h5>
+                                <div class="materiais-list">
+                                    <ul class="space-y-2 mb-4">
+                                        ${materiaisList}
+                                    </ul>
+                                </div>
+                                
+                                <!-- CORREÇÃO: Botão de adicionar material com posição fixa e z-index alto -->
+                                <button class="add-material-btn w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-lg transition-colors" onclick="openAddItemModal('${compra.id}')">
+                                    <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Adicionar Material
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                comprasListEl.appendChild(itemDiv);
+            });
         }
 
-        // Funções de Plano de Corte
-        function calcularProgresso(plano) {
-            let total = 0;
-            if (plano.fases.corte.status === 'finalizado') total += 33;
-            if (plano.fases.filetacao.status === 'finalizado') total += 33;
-            if (plano.fases.usinagem.status === 'finalizado') total += 34;
-            return total;
-        }
+        // NOVO: Função para abrir modal das máquinas
+        window.openMachinesModal = function(loteId) {
+            currentEditingLote = lotesList.find(lote => lote.id === loteId);
+            if (currentEditingLote) {
+                editSeccionadoraInput.value = currentEditingLote.observacaoSeccionadora || '';
+                editNanxingInput.value = currentEditingLote.observacaoNanxing || '';
+                machinesModal.classList.remove('hidden');
+            }
+        };
 
-        function iniciarFase(planoId, fase) {
-            const plano = DB.planos.find(p => p.id === planoId);
-            plano.fases[fase].status = 'em-andamento';
-            DB.save();
-            loadPlanos();
-        }
-
-        function finalizarFase(planoId, fase) {
-            const plano = DB.planos.find(p => p.id === planoId);
+        // Funções para expandir/colapsar lotes
+        window.toggleLoteDetails = function(loteId) {
+            const details = document.getElementById(`details-${loteId}`);
+            const chevron = document.getElementById(`chevron-${loteId}`);
             
-            if (fase === 'corte') {
-                const obsSec = document.getElementById(`obs-sec-${planoId}`).value;
-                const obsNan = document.getElementById(`obs-nan-${planoId}`).value;
-                plano.fases.corte.seccionadora.obs = obsSec;
-                plano.fases.corte.nanxing.obs = obsNan;
+            details.classList.toggle('expanded');
+            chevron.classList.toggle('rotated');
+        };
+
+        // Funções para expandir/colapsar compras
+        window.toggleCompraDetails = function(compraId) {
+            const details = document.getElementById(`details-compra-${compraId}`);
+            const chevron = document.getElementById(`chevron-compra-${compraId}`);
+            
+            details.classList.toggle('expanded');
+            chevron.classList.toggle('rotated');
+        };
+
+        // Compras form
+        compraForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const novaCompra = {
+                    cliente: {
+                        nome: document.getElementById('cliente-nome').value,
+                        ambientes: document.getElementById('cliente-ambientes').value,
+                    },
+                    materiais: [],
+                    dataHora: getFormattedDateTime()
+                };
+                await addDoc(collection(db, 'artifacts/default-app-id/public/data/compras'), novaCompra);
+                compraForm.reset();
+                showStatus('Compra cadastrada com sucesso!', 'bg-green-100 text-green-700');
+            } catch (error) {
+                console.error('Erro ao cadastrar compra:', error);
+                showStatus('Erro ao cadastrar compra. Tente novamente.', 'bg-red-100 text-red-700');
+            }
+        });
+
+        filterClienteBtn.addEventListener('click', () => {
+            const filterTerm = searchClienteInput.value;
+            renderCompras(filterTerm);
+        });
+
+        clearClienteFilterBtn.addEventListener('click', () => {
+            searchClienteInput.value = '';
+            renderCompras();
+        });
+
+        // Global functions for buttons
+        window.updateLoteStatus = async function(loteId, newStatus) {
+            try {
+                const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', loteId);
+                await updateDoc(docRef, { status: newStatus });
+                showStatus(`Status do lote atualizado para ${newStatus}!`, 'bg-green-100 text-green-700');
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+                showStatus('Erro ao atualizar status. Tente novamente.', 'bg-red-100 text-red-700');
+            }
+        };
+
+        window.deleteLote = async function(loteId) {
+            if (confirm('Tem certeza que deseja excluir este lote?')) {
+                try {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/lotes', loteId);
+                    await deleteDoc(docRef);
+                    showStatus('Lote excluído com sucesso!', 'bg-red-100 text-red-700');
+                } catch (error) {
+                    console.error('Erro ao excluir lote:', error);
+                    showStatus('Erro ao excluir lote. Tente novamente.', 'bg-red-100 text-red-700');
+                }
+            }
+        };
+
+        window.updateItemQuantity = async function(compraId, itemIndex, newQuantity) {
+            const num = parseInt(newQuantity);
+            if (!isNaN(num) && num >= 0) {
+                try {
+                    const compra = compras.find(c => c.id === compraId);
+                    if (compra) {
+                        compra.materiais[itemIndex].quantidade = num;
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                    }
+                } catch (error) {
+                    console.error('Erro ao atualizar quantidade:', error);
+                    renderCompras();
+                }
             } else {
-                const obs = document.getElementById(`obs-${fase === 'filetacao' ? 'fil' : 'usi'}-${planoId}`).value;
-                plano.fases[fase].obs = obs;
+                renderCompras();
             }
+        };
+        
+        window.removeItemFromCompra = async function(compraId, itemIndex) {
+            if (confirm('Tem certeza que deseja remover este material da compra?')) {
+                try {
+                    const compra = compras.find(c => c.id === compraId);
+                    if (compra) {
+                        compra.materiais.splice(itemIndex, 1);
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                        showStatus('Material removido com sucesso!', 'bg-yellow-100 text-yellow-700');
+                    }
+                } catch (error) {
+                    console.error('Erro ao remover material:', error);
+                    showStatus('Erro ao remover material. Tente novamente.', 'bg-red-100 text-red-700');
+                }
+            }
+        };
+
+        window.deleteCompra = async function(compraId) {
+            if (confirm('Tem certeza que deseja excluir esta compra e todos os seus itens?')) {
+                try {
+                    const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', compraId);
+                    await deleteDoc(docRef);
+                    showStatus('Compra excluída com sucesso!', 'bg-red-100 text-red-700');
+                } catch (error) {
+                    console.error('Erro ao excluir compra:', error);
+                    showStatus('Erro ao excluir compra. Tente novamente.', 'bg-red-100 text-red-700');
+                }
+            }
+        };
+
+        let currentCompraId = null;
+        const addItemModal = document.getElementById('add-item-modal');
+        const addItemForm = document.getElementById('add-item-form');
+        const cancelAddItemBtn = document.getElementById('cancel-add-item-btn');
+
+        window.openAddItemModal = function(compraId) {
+            currentCompraId = compraId;
+            addItemModal.classList.remove('hidden');
+        };
+
+        cancelAddItemBtn.addEventListener('click', () => {
+            addItemModal.classList.add('hidden');
+            addItemForm.reset();
+        });
+
+        addItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newItem = {
+                nome: document.getElementById('add-item-nome').value,
+                espessura: parseInt(document.getElementById('add-item-espessura').value),
+                quantidade: parseInt(document.getElementById('add-item-quantidade').value)
+            };
             
-            plano.fases[fase].status = 'finalizado';
-            DB.save();
-            loadPlanos();
-        }
-
-        function deletePlano(id) {
-            if (confirm('Tem certeza que deseja excluir este plano de corte?')) {
-                DB.planos = DB.planos.filter(p => p.id !== id);
-                DB.save();
-                loadPlanos();
+            if (currentCompraId !== null) {
+                try {
+                    const compra = compras.find(c => c.id === currentCompraId);
+                    if (compra) {
+                        compra.materiais.push(newItem);
+                        const docRef = doc(db, 'artifacts/default-app-id/public/data/compras', currentCompraId);
+                        await updateDoc(docRef, { materiais: compra.materiais });
+                        addItemModal.classList.add('hidden');
+                        addItemForm.reset();
+                        showStatus('Material adicionado à compra!', 'bg-green-100 text-green-700');
+                    }
+                } catch (error) {
+                    console.error('Erro ao adicionar material:', error);
+                    showStatus('Erro ao adicionar material. Tente novamente.', 'bg-red-100 text-red-700');
+                }
             }
-        }
+        });
 
-        // Funções de Solicitação
-        function iniciarSolicitacao(id) {
-            const sol = DB.solicitacoes.find(s => s.id === id);
-            sol.status = 'iniciado';
-            DB.save();
-            loadSolicitacoes();
-        }
-
-        function concluirSolicitacao(id) {
-            const sol = DB.solicitacoes.find(s => s.id === id);
-            const problema = document.getElementById(`problema-${id}`).value;
-            const resolucao = document.getElementById(`resolucao-${id}`).value;
+        function switchTab(tab){
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
             
-            if (!problema || !resolucao) {
-                alert('Por favor, preencha o local do problema e a resolução.');
-                return;
-            }
+            sectionCadastro.classList.add('hidden');
+            sectionInventario.classList.add('hidden');
+            sectionUtilizacao.classList.add('hidden');
+            sectionPlanoCorte.classList.add('hidden');
+            sectionCompras.classList.add('hidden');
             
-            sol.problema = problema;
-            sol.resolucao = resolucao;
-            sol.status = 'concluido';
-            DB.save();
-            loadSolicitacoes();
-            updateStats();
-        }
-
-        function deleteSolicitacao(id) {
-            if (confirm('Tem certeza que deseja excluir esta solicitação?')) {
-                DB.solicitacoes = DB.solicitacoes.filter(s => s.id !== id);
-                DB.save();
-                loadSolicitacoes();
-                updateStats();
+            if(tab === 'cadastro') {
+                sectionCadastro.classList.remove('hidden');
+                tabCadastroBtn.classList.add('active');
+            } else if(tab === 'inventario') {
+                sectionInventario.classList.remove('hidden');
+                tabInventarioBtn.classList.add('active');
+            } else if(tab === 'utilizacao') {
+                sectionUtilizacao.classList.remove('hidden');
+                tabUtilizacaoBtn.classList.add('active');
+            } else if(tab === 'plano-corte') {
+                sectionPlanoCorte.classList.remove('hidden');
+                tabPlanoCorteBtn.classList.add('active');
+                renderLotes();
+            } else if (tab === 'compras') {
+                sectionCompras.classList.remove('hidden');
+                tabComprasBtn.classList.add('active');
+                renderCompras();
             }
         }
 
-        // Função de deletar material
-        function deleteMaterial(id) {
-            if (confirm('Tem certeza que deseja excluir este material?')) {
-                DB.materiais = DB.materiais.filter(m => m.id !== id);
-                DB.save();
-                loadSobras();
-            }
+        tabCadastroBtn.addEventListener('click', () => switchTab('cadastro'));
+        tabInventarioBtn.addEventListener('click', () => switchTab('inventario'));
+        tabUtilizacaoBtn.addEventListener('click', () => switchTab('utilizacao'));
+        tabPlanoCorteBtn.addEventListener('click', () => switchTab('plano-corte'));
+        tabComprasBtn.addEventListener('click', () => switchTab('compras'));
+
+        function showStatus(msg, cls){
+            statusMessage.textContent = msg;
+            statusMessage.className = `mb-4 md:mb-6 p-3 md:p-4 rounded-lg font-medium ${cls}`;
+            statusMessage.classList.remove('hidden');
+            setTimeout(() => statusMessage.classList.add('hidden'), 3000);
         }
 
-        // Carregar dados iniciais
-        loadSobras();
+        switchTab('inventario');
     </script>
 </body>
 </html>
+
